@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - npm ci
+  build:
+    commands:
+      - envsubst < aws-exports.template.js > src/aws-exports.js
+      - npm run build
+artifacts:
+  base-directory: build
+  files:
+    - '**/*'
+cache:
+  paths:
+    - node_modules/**/*
