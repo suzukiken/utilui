@@ -13,16 +13,14 @@ function Login() {
     Hub.listen('auth', ({ payload: { event, data } }) => {
       switch (event) {
         case 'signIn':
-          getUser().then(userData => setUser(userData));
-          console.log('signIn', data);
+          console.log('signIn');
           break;
         case 'signOut':
-          console.log('signOut', data);
+          console.log('signOut');
           setUser(null);
           break;
         case 'signIn_failure':
-          getUser().then(userData => setUser(userData));
-          console.log('signIn_failure', data);
+          console.log('signIn_failure');
           break;
         default:
           console.log('default');
@@ -33,10 +31,12 @@ function Login() {
   }, []);
   
   useEffect(() => {
-    Auth.currentUserInfo().then((userInfoData) => {
-      setUserInfo(userInfoData);
-      console.log(user);
-    });
+    if (user) {
+      Auth.currentUserInfo().then((userInfoData) => {
+        setUserInfo(userInfoData);
+        console.log('currentUserInfo', userInfoData);
+      });
+    }
   }, [user]);
 
   function getUser() {
@@ -46,7 +46,7 @@ function Login() {
   }
   
   return (
-    <div class="navbar-end">
+    <div className="navbar-end">
       <div className="navbar-item">
         <div className="block">
           User: <strong>{userInfo ? userInfo.attributes.email : 'None'}</strong>
