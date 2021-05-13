@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Auth, Hub } from 'aws-amplify';
-
-let jwt
-
-export async function jwtRequestHeader() {
-  /* global jwt */
-  return { 'v-cognito-user-jwt': jwt }
-}
+import Amplify, { Auth, Hub } from 'aws-amplify';
 
 function Login() {
-  /* global jwt */
   const [user, setUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [jwt, setJwt] = useState(null);
+  
+  Amplify.configure({
+    API: {
+      graphql_headers: jwtRequestHeader
+    }
+  })
+  
+  async function jwtRequestHeader() {
+    return { 'v-cognito-user-jwt': jwt }
+  }
 
   useEffect(() => {
     Hub.listen('auth', ({ payload: { event, data } }) => {
@@ -48,7 +51,7 @@ function Login() {
         console.log('userData', userData)
         console.log(userData.attributes.email)
         const jwtToken = userData.signInUserSession.idToken.jwtToken
-        jwt = jwtToken
+        setJwt(jwtToken)
         const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
         console.log(jwtTokenPayload['cognito:username'])
         console.log(jwtTokenPayload['email'])
