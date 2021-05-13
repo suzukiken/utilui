@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import Amplify, { Auth, Hub } from 'aws-amplify';
-import awsconfig from './aws-exports';
+import { Auth, Hub } from 'aws-amplify';
 
-Amplify.configure(awsconfig);
+let jwt
+
+export async function jwtRequestHeader() {
+  /* global jwt */
+  return { 'v-cognito-user-jwt': jwt }
+}
 
 function Login() {
-  
+  /* global jwt */
   const [user, setUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  
+
   useEffect(() => {
     Hub.listen('auth', ({ payload: { event, data } }) => {
       switch (event) {
@@ -26,22 +30,30 @@ function Login() {
           console.log('default');
       }
     });
-    
     getUser().then(userData => setUser(userData));
   }, []);
   
   useEffect(() => {
     if (user) {
       Auth.currentUserInfo().then((userInfoData) => {
+        console.log('userinfo', userInfoData)
         setUserInfo(userInfoData);
-        console.log('currentUserInfo', userInfoData);
       });
     }
   }, [user]);
 
   function getUser() {
     return Auth.currentAuthenticatedUser()
-      .then(userData => userData)
+      .then(userData => {
+        console.log('userData', userData)
+        console.log(userData.attributes.email)
+        const jwtToken = userData.signInUserSession.idToken.jwtToken
+        jwt = jwtToken
+        const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
+        console.log(jwtTokenPayload['cognito:username'])
+        console.log(jwtTokenPayload['email'])
+        return userData
+      })
       .catch(() => console.log('Not signed in'));
   }
   

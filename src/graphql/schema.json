@@ -4,7 +4,9 @@
       "queryType" : {
         "name" : "Query"
       },
-      "mutationType" : null,
+      "mutationType" : {
+        "name" : "Mutation"
+      },
       "subscriptionType" : null,
       "types" : [ {
         "kind" : "OBJECT",
@@ -100,6 +102,26 @@
           "deprecationReason" : null
         }, {
           "name" : "katakana",
+          "description" : null,
+          "args" : [ ],
+          "type" : {
+            "kind" : "SCALAR",
+            "name" : "String",
+            "ofType" : null
+          },
+          "isDeprecated" : false,
+          "deprecationReason" : null
+        } ],
+        "inputFields" : null,
+        "interfaces" : [ ],
+        "enumValues" : null,
+        "possibleTypes" : null
+      }, {
+        "kind" : "OBJECT",
+        "name" : "Mutation",
+        "description" : null,
+        "fields" : [ {
+          "name" : "put",
           "description" : null,
           "args" : [ ],
           "type" : {
