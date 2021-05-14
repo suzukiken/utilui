@@ -21,3 +21,13 @@ export const getDiction = /* GraphQL */ `
     }
   }
 `;
+export const listCrossStackReferences = /* GraphQL */ `
+  query ListCrossStackReferences {
+    listCrossStackReferences {
+      stack
+      name
+      value
+      imports
+    }
+  }
+`;

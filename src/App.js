@@ -2,7 +2,7 @@ import './App.css';
 import Login from './Login';
 import { useEffect, useState } from 'react';
 import { graphqlOperation, API } from 'aws-amplify';
-import { getStrings, getDiction } from './graphql/queries';
+import { getStrings, getDiction, listCrossStackReferences } from './graphql/queries';
 import { put } from './graphql/mutations';
 
 function App() {
@@ -25,6 +25,14 @@ function App() {
       setDiction(response.data.getDiction);
       console.log(diction)
     } catch (err) { console.log('error doGet') }
+  }
+  
+  async function doListCrossStackReferences() {
+    try {
+
+      const response = await API.graphql(graphqlOperation(listCrossStackReferences));
+      console.log(response)
+    } catch (err) { console.log('error doListCrossStackReferences') }
   }
   
   async function doPut() {
@@ -79,6 +87,13 @@ function App() {
               className="button is-dark"
               onClick={() => doPut()}
               >Put
+            </button>
+          </div>
+          <div className="control">
+            <button 
+              className="button is-dark"
+              onClick={() => doListCrossStackReferences()}
+              >ListCrossStackReferences
             </button>
           </div>
         </div>
