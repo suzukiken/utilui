@@ -5,7 +5,7 @@ import { Button } from '@material-ui/core';
 import { listCrossStackReferences } from './graphql/queries';
 import { DataGrid } from '@material-ui/data-grid';
 
-function Strings() {
+function Dg() {
   const [exportList, setExportList] = useState([]);
   
   const columns = [
@@ -44,5 +44,5 @@ function Strings() {
   )
 }
 
-export default Strings
+export default Dg
 

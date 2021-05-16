@@ -2,8 +2,8 @@ import React from 'react';
 import Login from './Login';
 import Jwt from './Jwt';
 import ExportList from './ExportList';
-import Diction from './Diction';
-import Strings from './Strings';
+import Search from './Search';
+import Dg from './Dg';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -102,8 +102,8 @@ export default function App() {
           </Grid>
           <Grid item xs={3}>
             <Paper className={classes.paper}>
-              <Link href="/tree">
-                tree
+              <Link href="/search">
+                search
               </Link>
             </Paper>
           </Grid>
@@ -121,11 +121,13 @@ export default function App() {
           </Route>
           <Route path="/datagrid">
             <Container maxWidth="lg" component="main" className={classes.container}>
-              <Strings />
+              <Dg />
             </Container>
           </Route>
-          <Route path="/tree">
-            <Diction />
+          <Route path="/search">
+            <Container maxWidth="lg" component="main" className={classes.container}>
+              <Search />
+            </Container>
           </Route>
         </Switch>
       </BrowserRouter>
