@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Amplify, { Auth, Hub } from 'aws-amplify';
+import { Button } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  link: {
+    margin: theme.spacing(1, 1.5),
+  }
+}))
 
 function Login() {
+  const classes = useStyles();
+  
   const [user, setUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [jwt, setJwt] = useState(null);
@@ -61,30 +72,24 @@ function Login() {
   }
   
   return (
-    <div className="navbar-end">
-      <div className="navbar-item">
-        <div className="block">
-          User: <strong>{userInfo ? userInfo.attributes.email : 'None'}</strong>
-        </div>
-      </div>
-      <div className="navbar-item">
-        <div className="buttons">
-          { user?
-            <button 
-              className="button is-link"
-              onClick={() => Auth.signOut()}
-              >Sign Out
-            </button>
-          :
-            <button 
-              className="button is-link"
-              onClick={() => Auth.federatedSignIn()}
-              >Sign In
-            </button>
-          }
-        </div>
-      </div>
-    </div>
+    <React.Fragment>
+      <nav>
+        <Typography className={classes.link}>
+          User: {userInfo ? userInfo.attributes.email : 'None'}
+        </Typography>
+      </nav>
+      { user?
+        <Button variant="contained"
+          onClick={() => Auth.signOut()}
+          >Sign Out
+        </Button>
+        :
+        <Button color="primary" variant="outlined" className={classes.link}
+          onClick={() => Auth.federatedSignIn()}
+          >Sign In
+        </Button>
+      }
+    </React.Fragment>
   )
 }
 

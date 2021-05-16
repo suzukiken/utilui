@@ -1,151 +1,135 @@
-import './App.css';
+import React from 'react';
 import Login from './Login';
-import { useEffect, useState } from 'react';
-import { graphqlOperation, API } from 'aws-amplify';
-import { getStrings, getDiction, listCrossStackReferences } from './graphql/queries';
-import { put } from './graphql/mutations';
+import Jwt from './Jwt';
+import ExportList from './ExportList';
+import Diction from './Diction';
+import Strings from './Strings';
+import AppBar from '@material-ui/core/AppBar';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import Link from '@material-ui/core/Link';
 
-function App() {
-  const [strings, setStrings] = useState([]);
-  const [diction, setDiction] = useState({});
-  const [list_active, setListActive] = useState('');
-  const [dict_active, setDictActive] = useState('');
-  
-  async function doGetStrings() {
-    try {
-      const response = await API.graphql(graphqlOperation(getStrings));
-      setStrings(response.data.getStrings);
-      console.log(response.data.getStrings)
-    } catch (err) { console.log('error doGet') }
-  }
-  
-  async function doGetDiction() {
-    try {
-      const response = await API.graphql(graphqlOperation(getDiction));
-      setDiction(response.data.getDiction);
-      console.log(diction)
-    } catch (err) { console.log('error doGet') }
-  }
-  
-  async function doListCrossStackReferences() {
-    try {
+const useStyles = makeStyles((theme) => ({
+  '@global': {
+    ul: {
+      margin: 0,
+      padding: 0,
+      listStyle: 'none',
+    },
+  },
+  appBar: {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    backgroundColor: theme.palette.grey[200],
+  },
+  toolbar: {
+    flexWrap: 'wrap',
+  },
+  toolbarTitle: {
+    flexGrow: 1,
+  },
+  link: {
+    margin: theme.spacing(1, 1.5),
+  },
+  cardHeader: {
+    backgroundColor: theme.palette.grey[300],
+  },
+  cardPricing: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'baseline',
+    marginBottom: theme.spacing(2),
+  },
+  footer: {
+    borderTop: `1px solid ${theme.palette.divider}`,
+    marginTop: theme.spacing(8),
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3),
+    [theme.breakpoints.up('sm')]: {
+      paddingTop: theme.spacing(6),
+      paddingBottom: theme.spacing(6),
+    },
+  },
+  paper: {
+    padding: theme.spacing(2),
+    margin: theme.spacing(10, 0),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+}))
 
-      const response = await API.graphql(graphqlOperation(listCrossStackReferences));
-      console.log(response)
-    } catch (err) { console.log('error doListCrossStackReferences') }
-  }
-  
-  async function doPut() {
-    try {
+export default function App() {
+  const classes = useStyles();
 
-      const response = await API.graphql(graphqlOperation(put));
-      console.log(response)
-    } catch (err) { console.log('error doPut') }
-  }
-  
-  useEffect(() => {
-    if (0 < strings.length) {
-      setListActive('is-active')
-    } else {
-      setListActive('')
-    }
-  }, [strings])
-  
-  useEffect(() => {
-    if (Object.keys(diction).length) {
-      setDictActive('is-active')
-    } else {
-      setDictActive('')
-    }
-  }, [diction])
-  
   return (
-    <div>
-      <nav className="navbar" role="navigation" aria-label="main navigation">
-        <div id="navbarBasicExample" className="navbar-menu">
+    <React.Fragment>
+      <CssBaseline />
+      <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
+          <Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
+            FigmentResearch
+          </Typography>
           <Login />
-        </div>
-      </nav>
-      <section className="section">
-        <div className="field is-grouped">
-          <div className="control">
-            <button 
-              className="button is-dark"
-              onClick={() => doGetStrings()}
-              >Get Strings
-            </button>
-          </div>
-          <div className="control">
-            <button 
-              className="button is-dark"
-              onClick={() => doGetDiction()}
-              >Get Dictionary
-            </button>
-          </div>
-          <div className="control">
-            <button 
-              className="button is-dark"
-              onClick={() => doPut()}
-              >Put
-            </button>
-          </div>
-          <div className="control">
-            <button 
-              className="button is-dark"
-              onClick={() => doListCrossStackReferences()}
-              >ListCrossStackReferences
-            </button>
-          </div>
-        </div>
-      </section>
-      <div className={`modal ${dict_active}`}>
-        <div className="modal-background"></div>
-        <div className="modal-card">
-          <header className="modal-card-head">
-            <p className="modal-card-title">Modal title</p>
-            <button className="delete" aria-label="close" onClick={() => setDictActive('')}></button>
-          </header>
-          <section className="modal-card-body">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Key</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>number</td><td>{diction.number}</td></tr>
-                <tr><td>kanji</td><td>{diction.kanji}</td></tr>
-                <tr><td>english</td><td>{diction.english}</td></tr>
-                <tr><td>katakana</td><td>{diction.katakana}</td></tr>
-              </tbody>
-            </table>
-          </section>
-          <footer className="modal-card-foot">
-          </footer>
-        </div>
-      </div>
-      <div className={`modal ${list_active}`}>
-        <div className="modal-background"></div>
-        <div className="modal-card">
-          <header className="modal-card-head">
-            <p className="modal-card-title">Modal title</p>
-            <button className="delete" aria-label="close" onClick={() => setListActive('')}></button>
-          </header>
-          <section className="modal-card-body">
-            <ul>
-              {strings.map((s, index) =>
-                <li key={index}>{s}</li>
-              )}
-            </ul>
-          </section>
-          <footer className="modal-card-foot">
-          </footer>
-        </div>
-      </div>
-    </div>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="lg" component="main">
+        <Grid container spacing={3}>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>
+              <Link href="/jwt">
+                jwt
+              </Link>
+            </Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>
+              <Link href="/table">
+                table
+              </Link>
+            </Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>
+              <Link href="/datagrid">
+                datagrid
+              </Link>
+            </Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>
+              <Link href="/tree">
+                tree
+              </Link>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/jwt">
+            <Jwt />
+          </Route>
+          <Route path="/table">
+            <Container maxWidth="lg" component="main" className={classes.container}>
+              <ExportList />
+            </Container>
+          </Route>
+          <Route path="/datagrid">
+            <Container maxWidth="lg" component="main" className={classes.container}>
+              <Strings />
+            </Container>
+          </Route>
+          <Route path="/tree">
+            <Diction />
+          </Route>
+        </Switch>
+      </BrowserRouter>
+    </React.Fragment>
   );
 }
-
-export default App;
 
