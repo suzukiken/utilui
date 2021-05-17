@@ -4,10 +4,13 @@ import { Button } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
-import ListItemText from '@material-ui/core/ListItemText';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 import { useState } from 'react';
 import React from 'react';
 
@@ -39,176 +42,97 @@ function Jwt() {
           Check if Jwt is on http header.
         </Typography>
       </Container>
-      <Container maxWidth="lg" component="main" className={classes.heroContent}>
+      <Container maxWidth="md" component="main" className={classes.heroContent}>
         <Button
           variant="contained" color="primary"
           onClick={() => doParseJwt()}
           >Put
         </Button>
         { claims ? 
-          <List className={classes.root}>
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="at_hash"
-              />
-              <ListItemText
-                primary={claims.at_hash}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="sub"
-              />
-              <ListItemText
-                primary={claims.sub}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="cognito_groups.0"
-              />
-              <ListItemText
-                primary={claims.cognito_groups[0]}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="email_verified"
-              />
-              <ListItemText
-                primary={claims.email_verified}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="iss"
-              />
-              <ListItemText
-                primary={claims.iss}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="cognito_username"
-              />
-              <ListItemText
-                primary={claims.cognito_username}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="aud"
-              />
-              <ListItemText
-                primary={claims.aud}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.userId"
-              />
-              <ListItemText
-                primary={claims.identities[0].userId}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.providerName"
-              />
-              <ListItemText
-                primary={claims.identities[0].providerName}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.providerType"
-              />
-              <ListItemText
-                primary={claims.identities[0].providerType}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.issuer"
-              />
-              <ListItemText
-                primary={claims.identities[0].issuer}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.primary"
-              />
-              <ListItemText
-                primary={claims.identities[0].primary}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="identities.0.dateCreated"
-              />
-              <ListItemText
-                primary={claims.identities[0].dateCreated}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="token_use"
-              />
-              <ListItemText
-                primary={claims.token_use}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="auth_time"
-              />
-              <ListItemText
-                primary={claims.auth_time}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="exp"
-              />
-              <ListItemText
-                primary={claims.exp}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="iat"
-              />
-              <ListItemText
-                primary={claims.iat}
-              />
-            </ListItem>
-            <Divider variant="inset" component="li" />
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary="email"
-              />
-              <ListItemText
-                primary={claims.email}
-              />
-            </ListItem>
-          </List>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>at_hash</TableCell>
+                  <TableCell>{claims.at_hash}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>sub</TableCell>
+                  <TableCell>{claims.sub}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>cognito_groups.0</TableCell>
+                  <TableCell>{claims.cognito_groups[0]}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>email_verified</TableCell>
+                  <TableCell>{claims.email_verified}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>iss</TableCell>
+                  <TableCell>{claims.iss}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>cognito:username</TableCell>
+                  <TableCell>{claims.cognito_username}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>aud</TableCell>
+                  <TableCell>{claims.aud}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.userId</TableCell>
+                  <TableCell>{claims.identities[0].userId}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.providerName</TableCell>
+                  <TableCell>{claims.identities[0].providerName}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.providerType</TableCell>
+                  <TableCell>{claims.identities[0].providerType}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.issuer</TableCell>
+                  <TableCell>{claims.identities[0].issuer}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.primary</TableCell>
+                  <TableCell>{claims.identities[0].primary}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>identities.0.dateCreated</TableCell>
+                  <TableCell>{claims.identities[0].dateCreated}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>token_use</TableCell>
+                  <TableCell>{claims.token_use}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>auth_time</TableCell>
+                  <TableCell>{claims.auth_time}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>exp</TableCell>
+                  <TableCell>{claims.exp}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>iat</TableCell>
+                  <TableCell>{claims.iat}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>email</TableCell>
+                  <TableCell>{claims.email}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         : '' }
       </Container>
     </React.Fragment>

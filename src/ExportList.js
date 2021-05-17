@@ -22,7 +22,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Link from '@material-ui/core/Link';
 import Badge from '@material-ui/core/Badge';
 import Fuse from 'fuse.js';
-import InfoIcon from '@material-ui/icons/Info';
 import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,6 +31,12 @@ const useStyles = makeStyles((theme) => ({
   container: {
     margin: theme.spacing(3, 0),
   },
+  howto: {
+    margin: theme.spacing(0, 2),
+  },
+  controlls: {
+    margin: theme.spacing(1, 0),
+  }
 }))
 
 const useRowStyles = makeStyles({
@@ -43,6 +48,7 @@ const useRowStyles = makeStyles({
 })
 
 function InfoPopover() {
+  const classes = useStyles();
   const [anchorElement, setAnchorElement] = useState(null);
   
   const show = (event) => {
@@ -58,9 +64,8 @@ function InfoPopover() {
   
   return (
     <React.Fragment>
-      <Link aria-describedby={id} onClick={show}>
-        <InfoIcon />
-        how to search
+      <Link className={classes.howto} aria-describedby={id} onClick={show}>
+        how to search 
       </Link>
       <Popover
         id={id}
@@ -249,7 +254,8 @@ function ExportList() {
   }
   
   const fuseOptions = {
-    keys: ['name']
+    keys: ['name'],
+    useExtendedSearch: true
   }
   
   const fuse = new Fuse(exportList, fuseOptions)
@@ -266,17 +272,20 @@ function ExportList() {
 
   return (
     <React.Fragment>
-      <Button
-        variant="contained" color="primary"
-        onClick={() => doListCrossStackReferences()}
-        >List
-      </Button>
-      
-      <form noValidate autoComplete="off">
-        <TextField id="sw" label="Search" variant="outlined" value={searchWord} onChange={search} />
-        <InfoPopover />
-      </form>
-      
+      <Box component="div" className={classes.controlls}>
+        <Button
+          variant="contained" color="primary"
+          onClick={() => doListCrossStackReferences()}
+          >List
+        </Button>
+      </Box>
+      <Box component="div" className={classes.controlls}>
+        <form noValidate autoComplete="off">
+          <TextField id="sw" label="Search" variant="outlined" size="small" value={searchWord} onChange={search} />
+          <InfoPopover />
+        </form>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
