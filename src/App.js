@@ -8,8 +8,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 
@@ -30,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbarTitle: {
     flexGrow: 1,
+  },
+  toolbarLink: {
+    margin: theme.spacing(0, 1.5),
   },
   link: {
     margin: theme.spacing(1, 1.5),
@@ -70,29 +71,19 @@ export default function App() {
       <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
-            FigmentResearch
+            <Link href="/">
+              FigmentResearch
+            </Link>
           </Typography>
+          <Link href="/jwt" className={classes.toolbarLink}>
+            JWT
+          </Link>
+          <Link href="/table" className={classes.toolbarLink}>
+            CFN
+          </Link>
           <Login />
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg" component="main">
-        <Grid container spacing={3}>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>
-              <Link href="/jwt">
-                jwt
-              </Link>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>
-              <Link href="/table">
-                table
-              </Link>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
       <BrowserRouter>
         <Switch>
           <Route path="/jwt">

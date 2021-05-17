@@ -23,10 +23,14 @@ import Link from '@material-ui/core/Link';
 import Badge from '@material-ui/core/Badge';
 import Fuse from 'fuse.js';
 import TextField from '@material-ui/core/TextField';
+import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
+  },
+  heroContent: {
+    padding: theme.spacing(4, 0, 6),
   },
   container: {
     margin: theme.spacing(3, 0),
@@ -272,6 +276,16 @@ function ExportList() {
 
   return (
     <React.Fragment>
+    
+      <Container maxWidth="lg" component="main" className={classes.heroContent}>
+        <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+          CloudFormation Exported Parameter List
+        </Typography>
+        <Typography variant="h5" align="center" color="textSecondary" component="p">
+          See Parameters with its Importers.
+        </Typography>
+      </Container>
+    
       <Box component="div" className={classes.controlls}>
         <Button
           variant="contained" color="primary"
