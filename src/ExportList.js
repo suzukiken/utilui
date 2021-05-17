@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0, 2),
   },
   controlls: {
-    margin: theme.spacing(1, 0),
+    margin: theme.spacing(1.5, 0),
   }
 }))
 
