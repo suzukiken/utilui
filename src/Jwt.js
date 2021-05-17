@@ -42,7 +42,7 @@ function Jwt() {
           Check if Jwt is on http header.
         </Typography>
       </Container>
-      <Container maxWidth="md" component="main" className={classes.heroContent}>
+      <Container maxWidth="md" component="main">
         <Button
           variant="contained" color="primary"
           onClick={() => doParseJwt()}
