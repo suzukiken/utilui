@@ -2,8 +2,6 @@ import React from 'react';
 import Login from './Login';
 import Jwt from './Jwt';
 import ExportList from './ExportList';
-import Search from './Search';
-import Dg from './Dg';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -79,31 +77,17 @@ export default function App() {
       </AppBar>
       <Container maxWidth="lg" component="main">
         <Grid container spacing={3}>
-          <Grid item xs={3}>
+          <Grid item xs={6}>
             <Paper className={classes.paper}>
               <Link href="/jwt">
                 jwt
               </Link>
             </Paper>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={6}>
             <Paper className={classes.paper}>
               <Link href="/table">
                 table
-              </Link>
-            </Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>
-              <Link href="/datagrid">
-                datagrid
-              </Link>
-            </Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>
-              <Link href="/search">
-                search
               </Link>
             </Paper>
           </Grid>
@@ -117,16 +101,6 @@ export default function App() {
           <Route path="/table">
             <Container maxWidth="lg" component="main" className={classes.container}>
               <ExportList />
-            </Container>
-          </Route>
-          <Route path="/datagrid">
-            <Container maxWidth="lg" component="main" className={classes.container}>
-              <Dg />
-            </Container>
-          </Route>
-          <Route path="/search">
-            <Container maxWidth="lg" component="main" className={classes.container}>
-              <Search />
             </Container>
           </Route>
         </Switch>

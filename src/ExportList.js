@@ -20,6 +20,10 @@ import Typography from '@material-ui/core/Typography';
 import Popover from '@material-ui/core/Popover';
 import { v4 as uuidv4 } from 'uuid';
 import Link from '@material-ui/core/Link';
+import Badge from '@material-ui/core/Badge';
+import Fuse from 'fuse.js';
+import InfoIcon from '@material-ui/icons/Info';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -37,6 +41,98 @@ const useRowStyles = makeStyles({
     },
   },
 })
+
+function InfoPopover() {
+  const [anchorElement, setAnchorElement] = useState(null);
+  
+  const show = (event) => {
+    setAnchorElement(event.currentTarget)
+  }
+
+  const hide = () => {
+    setAnchorElement(null)
+  }
+  
+  const id = 'info'
+  const open = Boolean(anchorElement)
+  
+  return (
+    <React.Fragment>
+      <Link aria-describedby={id} onClick={show}>
+        <InfoIcon />
+        how to search
+      </Link>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorElement}
+        onClose={hide}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <div style={{ padding: 20 }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Match type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>jscript</code></td>
+                <td>fuzzy-match</td>
+                <td>Items that fuzzy match <code>jscript</code></td>
+              </tr>
+              <tr>
+                <td><code>=scheme</code></td>
+                <td>exact-match</td>
+                <td>Items that are <code>scheme</code></td>
+              </tr>
+              <tr>
+                <td><code>'python</code></td>
+                <td>include-match</td>
+                <td>Items that include <code>python</code></td>
+              </tr>
+              <tr>
+                <td><code>!ruby</code></td>
+                <td>inverse-exact-match</td>
+                <td>Items that do not include <code>ruby</code></td>
+              </tr>
+              <tr>
+                <td><code>^java</code></td>
+                <td>prefix-exact-match</td>
+                <td>Items that start with <code>java</code></td>
+              </tr>
+              <tr>
+                <td><code>!^earlang</code></td>
+                <td>inverse-prefix-exact-match</td>
+                <td>Items that do not start with <code>earlang</code></td>
+              </tr>
+              <tr>
+                <td><code>.js$</code></td>
+                <td>suffix-exact-match</td>
+                <td>Items that end with <code>.js</code></td>
+              </tr>
+              <tr>
+                <td><code>!.go$</code></td>
+                <td>inverse-suffix-exact-match</td>
+                <td>Items that do not end with <code>.go</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Popover>
+    </React.Fragment>
+  )
+}
 
 function ValPopover(props) {
   const { row } = props;
@@ -94,7 +190,15 @@ function Row(props) {
         <TableCell>
           {row.imports.length ? 
             <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              {open ? 
+                <Badge badgeContent={row.imports.length} color="primary">
+                  <KeyboardArrowUpIcon /> 
+                </Badge>
+                : 
+                <Badge badgeContent={row.imports.length} color="primary">
+                  <KeyboardArrowDownIcon />
+                </Badge>
+              }
             </IconButton>
           :
             ''
@@ -132,13 +236,32 @@ function ExportList() {
   const classes = useStyles();
   
   const [exportList, setExportList] = useState([]);
+  const [showingList, setShowingList] = useState([]);
+  const [searchWord, setSearchWord] = useState([]);
   
   async function doListCrossStackReferences() {
     try {
       const response = await API.graphql(graphqlOperation(listCrossStackReferences));
       console.log(response)
       setExportList(response.data.listCrossStackReferences)
+      setShowingList(response.data.listCrossStackReferences)
     } catch (err) { console.log('error doListCrossStackReferences') }
+  }
+  
+  const fuseOptions = {
+    keys: ['name']
+  }
+  
+  const fuse = new Fuse(exportList, fuseOptions)
+  
+  function search(event) {
+    setSearchWord(event.target.value)
+    const result = fuse.search(searchWord)
+    const searchedList = []
+    for (let i=0; i<result.length; i++) {
+      searchedList.push(result[i].item)
+    }
+    setShowingList(searchedList)
   }
 
   return (
@@ -148,6 +271,12 @@ function ExportList() {
         onClick={() => doListCrossStackReferences()}
         >List
       </Button>
+      
+      <form noValidate autoComplete="off">
+        <TextField id="sw" label="Search" variant="outlined" value={searchWord} onChange={search} />
+        <InfoPopover />
+      </form>
+      
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
@@ -159,7 +288,7 @@ function ExportList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {exportList.map((row, index) => (
+            {showingList.map((row, index) => (
               <Row key={index} row={row} />
             ))}
           </TableBody>
