@@ -26,11 +26,8 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 650,
-  },
   heroContent: {
-    padding: theme.spacing(4, 0, 6),
+    padding: theme.spacing(4, 0, 4),
   },
   container: {
     margin: theme.spacing(3, 0),
@@ -39,7 +36,10 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0, 2),
   },
   controlls: {
-    margin: theme.spacing(1.5, 0),
+    margin: theme.spacing(4, 0, 1),
+  },
+  tableContainer: {
+    margin: theme.spacing(2, 0, 10),
   }
 }))
 
@@ -78,66 +78,68 @@ function InfoPopover() {
         onClose={hide}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'center',
+          horizontal: 'left',
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'center',
+          horizontal: 'left',
         }}
       >
-        <div style={{ padding: 20 }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Token</th>
-                <th>Match type</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>jscript</code></td>
-                <td>fuzzy-match</td>
-                <td>Items that fuzzy match <code>jscript</code></td>
-              </tr>
-              <tr>
-                <td><code>=scheme</code></td>
-                <td>exact-match</td>
-                <td>Items that are <code>scheme</code></td>
-              </tr>
-              <tr>
-                <td><code>'python</code></td>
-                <td>include-match</td>
-                <td>Items that include <code>python</code></td>
-              </tr>
-              <tr>
-                <td><code>!ruby</code></td>
-                <td>inverse-exact-match</td>
-                <td>Items that do not include <code>ruby</code></td>
-              </tr>
-              <tr>
-                <td><code>^java</code></td>
-                <td>prefix-exact-match</td>
-                <td>Items that start with <code>java</code></td>
-              </tr>
-              <tr>
-                <td><code>!^earlang</code></td>
-                <td>inverse-prefix-exact-match</td>
-                <td>Items that do not start with <code>earlang</code></td>
-              </tr>
-              <tr>
-                <td><code>.js$</code></td>
-                <td>suffix-exact-match</td>
-                <td>Items that end with <code>.js</code></td>
-              </tr>
-              <tr>
-                <td><code>!.go$</code></td>
-                <td>inverse-suffix-exact-match</td>
-                <td>Items that do not end with <code>.go</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Box p={3}>
+          <TableContainer>
+            <Table size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Token</TableCell>
+                  <TableCell>Match type</TableCell>
+                  <TableCell>Description</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell><code>jscript</code></TableCell>
+                  <TableCell>fuzzy-match</TableCell>
+                  <TableCell>Items that fuzzy match <code>jscript</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>=scheme</code></TableCell>
+                  <TableCell>exact-match</TableCell>
+                  <TableCell>Items that are <code>scheme</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>'python</code></TableCell>
+                  <TableCell>include-match</TableCell>
+                  <TableCell>Items that include <code>python</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>!ruby</code></TableCell>
+                  <TableCell>inverse-exact-match</TableCell>
+                  <TableCell>Items that do not include <code>ruby</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>^java</code></TableCell>
+                  <TableCell>prefix-exact-match</TableCell>
+                  <TableCell>Items that start with <code>java</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>!^earlang</code></TableCell>
+                  <TableCell>inverse-prefix-exact-match</TableCell>
+                  <TableCell>Items that do not start with <code>earlang</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>.js$</code></TableCell>
+                  <TableCell>suffix-exact-match</TableCell>
+                  <TableCell>Items that end with <code>.js</code></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell><code>!.go$</code></TableCell>
+                  <TableCell>inverse-suffix-exact-match</TableCell>
+                  <TableCell>Items that do not end with <code>.go</code></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Popover>
     </React.Fragment>
   )
@@ -285,8 +287,8 @@ function ExportList() {
           See Parameters with its Importers.
         </Typography>
       </Container>
-    
-      <Box component="div" className={classes.controlls}>
+      
+      <Box display="flex" justifyContent="center">
         <Button
           variant="contained" color="primary"
           onClick={() => doListCrossStackReferences()}
@@ -300,8 +302,8 @@ function ExportList() {
         </form>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
+      <TableContainer component={Paper} className={classes.tableContainer}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Imports</TableCell>

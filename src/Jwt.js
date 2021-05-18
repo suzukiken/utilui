@@ -11,13 +11,17 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
 import { useState } from 'react';
 import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
-    padding: theme.spacing(4, 0, 6),
+    padding: theme.spacing(4, 0, 4),
   },
+  tableContainer: {
+    margin: theme.spacing(6, 0, 10),
+  }
 }))
 
 function Jwt() {
@@ -43,13 +47,15 @@ function Jwt() {
         </Typography>
       </Container>
       <Container maxWidth="md" component="main">
-        <Button
-          variant="contained" color="primary"
-          onClick={() => doParseJwt()}
-          >Put
-        </Button>
+        <Box display="flex" justifyContent="center" m={2}>
+          <Button
+            variant="contained" color="primary"
+            onClick={() => doParseJwt()}
+            >Put
+          </Button>
+        </Box>
         { claims ? 
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} className={classes.tableContainer}>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
