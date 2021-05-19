@@ -42,3 +42,14 @@ export const parseJwt = /* GraphQL */ `
     }
   }
 `;
+export const listFictions = /* GraphQL */ `
+  query ListFictions {
+    listFictions {
+      id
+      sku
+      name
+      pcs
+      ship
+    }
+  }
+`;

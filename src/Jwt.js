@@ -14,10 +14,11 @@ import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import { useState } from 'react';
 import React from 'react';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
-    padding: theme.spacing(4, 0, 4),
+    padding: theme.spacing(4, 0, 2),
   },
   tableContainer: {
     margin: theme.spacing(6, 0, 10),
@@ -26,12 +27,15 @@ const useStyles = makeStyles((theme) => ({
 
 function Jwt() {
   const classes = useStyles();
+  const [loading, setLoading] = useState(false);
   const [claims, setClaims] = useState(null);
   
   async function doParseJwt() {
     try {
+      setLoading(true)
       const response = await API.graphql(graphqlOperation(parseJwt));
       console.log(response)
+      setLoading(false)
       setClaims(response.data.parseJwt)
     } catch (err) { console.log('error doParseJwt') }
   }
@@ -54,6 +58,7 @@ function Jwt() {
             >Send
           </Button>
         </Box>
+        { loading ? <LinearProgress /> : '' }
         { claims ? 
           <TableContainer component={Paper} className={classes.tableContainer}>
             <Table aria-label="simple table">

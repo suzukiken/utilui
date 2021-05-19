@@ -1,18 +1,28 @@
 import * as React from 'react';
-import { DataGrid } from '@material-ui/data-grid';
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridColumnsToolbarButton,
+} from '@material-ui/data-grid';
+
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import { graphqlOperation, API } from 'aws-amplify';
+import { listFictions } from './graphql/queries';
+import { updateFiction, deleteFiction } from './graphql/mutations';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
-    padding: theme.spacing(4, 0, 4),
+    padding: theme.spacing(4, 0, 2),
   },
   datagridContainer: {
-    height: 500
+    height: 500,
+    flexGrow: 1
   },
   button: {
     margin: theme.spacing(1),
@@ -20,36 +30,32 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const columns = [
-  { field: 'name', headerName: 'Name', width: 180, editable: true },
-  { field: 'age', headerName: 'Age', type: 'number', editable: true },
+  { field: 'id', headerName: 'Id', width: 380, editable: false },
+  { field: 'sku', headerName: 'Sku', width: 90, editable: true },
+  { field: 'name', headerName: 'Name', width: 130, editable: true },
+  { field: 'pcs', headerName: 'Pcs', width: 90, type: 'number', editable: true },
   {
-    field: 'created',
-    headerName: 'Created',
+    field: 'ship',
+    headerName: 'Ship',
     type: 'date',
     width: 180,
     editable: true,
   }
 ]
 
-const initialRows = [
-  {
-    id: 1,
-    name: 'ken',
-    age: 25,
-    created: '2020/05/01',
-  },
-  {
-    id: 2,
-    name: 'tetu',
-    age: 36,
-    created: '2020/05/01',
-  },
-]
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridColumnsToolbarButton />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  )
+}
 
 function Editor() {
   const classes = useStyles();
   
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState([]);
   
   function getLargestId() {
     let largestId = 0
@@ -61,12 +67,23 @@ function Editor() {
     return largestId
   }
   
-  function showRows() {
-    console.log(rows)
+  function deleteRow() {
+    console.log('deleteRow')
+    /*
+    try {
+      const response = await API.graphql(graphqlOperation(deleteFiction, {id: }));
+      console.log(response.data.deleteFiction)
+      doList()
+    } catch (err) { console.log('error deleteRow') }
+    */
   }
   
-  function initRows() {
-    setRows(initialRows)
+  async function doList() {
+    try {
+      const response = await API.graphql(graphqlOperation(listFictions));
+      console.log(response)
+      setRows(response.data.listFictions)
+    } catch (err) { console.log('error listFictions') }
   }
   
   function addRow() {
@@ -87,7 +104,7 @@ function Editor() {
   
   const handleEditRowModelChange = React.useCallback((params) => {
     console.log('handleEditRowModelChange', params)
-  }, []);
+  }, [])
   
   const handleEditCellChangeCommitted = React.useCallback(
     ({ id, field, props }) => {
@@ -96,7 +113,7 @@ function Editor() {
       console.log('handleEditCellChangeCommitted', props)
     },
     [],
-  );
+  )
 
   const handleEditCellChange = React.useCallback(
     ({ id, field, props }) => {
@@ -105,7 +122,14 @@ function Editor() {
       console.log('handleEditCellChange', props)
     },
     [],
-  );
+  )
+  
+  const handleRowSelected = React.useCallback(
+    (params) => {
+      console.log('handleRowSelected', params)
+    },
+    [],
+  )
   
   return (
     <React.Fragment> 
@@ -117,31 +141,42 @@ function Editor() {
           Try edit values in cells.
         </Typography>
       </Container>
-      <Container maxWidth="sm" className={classes.datagridContainer}>
+      <Container maxWidth="md" className={classes.datagridContainer}>
         <Box display="flex" justifyContent="center" m={2}>
           <Button className={classes.button}
             variant="contained" color="primary"
+            onClick={() => doList()}
+            >Pull Remote Rows
+          </Button>
+          <Button className={classes.button}
+            variant="contained" color="primary"
             onClick={() => addRow()}
-            >Add
+            >Add an Empty Row
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
-            onClick={() => showRows()}
-            >Show
+            onClick={() => addRow()}
+            >Push Selected Rows
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
-            onClick={() => initRows()}
-            >Init
+            onClick={() => deleteRow()}
+            >Delete Selected Rows
           </Button>
         </Box>
-        <DataGrid 
-          rows={rows} 
-          columns={columns}
-          onEditRowModelChange={handleEditRowModelChange}
-          onEditCellChangeCommitted={handleEditCellChangeCommitted}
-          onEditCellChange={handleEditCellChange}
-        />
+          <DataGrid 
+            rows={rows} 
+            columns={columns}
+            onEditRowModelChange={handleEditRowModelChange}
+            onEditCellChangeCommitted={handleEditCellChangeCommitted}
+            onEditCellChange={handleEditCellChange}
+            onRowSelected={handleRowSelected}
+            pageSize="10"
+            components={{
+              Toolbar: CustomToolbar,
+            }}
+            checkboxSelection
+          />
       </Container>
     </React.Fragment> 
   );
