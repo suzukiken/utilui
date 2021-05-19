@@ -2,6 +2,7 @@ import React from 'react';
 import Login from './Login';
 import Jwt from './Jwt';
 import ExportList from './ExportList';
+import Editor from './Editor';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -71,7 +72,7 @@ export default function App() {
       <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
-            <Link href="/">
+            <Link href="/" color="inherit">
               FigmentResearch
             </Link>
           </Typography>
@@ -80,6 +81,9 @@ export default function App() {
           </Link>
           <Link href="/table" className={classes.toolbarLink}>
             CFN
+          </Link>
+          <Link href="/editor" className={classes.toolbarLink}>
+            EDITOR
           </Link>
           <Login />
         </Toolbar>
@@ -93,6 +97,9 @@ export default function App() {
             <Container maxWidth="lg" component="main" className={classes.container}>
               <ExportList />
             </Container>
+          </Route>
+          <Route path="/editor">
+            <Editor />
           </Route>
         </Switch>
       </BrowserRouter>

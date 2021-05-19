@@ -51,7 +51,7 @@ function Jwt() {
           <Button
             variant="contained" color="primary"
             onClick={() => doParseJwt()}
-            >Put
+            >Send
           </Button>
         </Box>
         { claims ? 
