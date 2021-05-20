@@ -23,3 +23,21 @@ export const deleteFiction = /* GraphQL */ `
     }
   }
 `;
+export const batchDeleteFictions = /* GraphQL */ `
+  mutation BatchDeleteFictions($ids: [String]) {
+    batchDeleteFictions(ids: $ids) {
+      id
+    }
+  }
+`;
+export const batchPutFictions = /* GraphQL */ `
+  mutation BatchPutFictions($fictions: [FictionInput]) {
+    batchPutFictions(fictions: $fictions) {
+      id
+      sku
+      name
+      pcs
+      ship
+    }
+  }
+`;

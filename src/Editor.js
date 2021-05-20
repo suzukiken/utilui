@@ -14,7 +14,8 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
 import { listFictions } from './graphql/queries';
-import { updateFiction, deleteFiction } from './graphql/mutations';
+import { batchPutFictions, batchDeleteFictions } from './graphql/mutations';
+import { v1 as uuidv1 } from 'uuid';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -29,20 +30,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const columns = [
-  { field: 'id', headerName: 'Id', width: 380, editable: false },
-  { field: 'sku', headerName: 'Sku', width: 90, editable: true },
-  { field: 'name', headerName: 'Name', width: 130, editable: true },
-  { field: 'pcs', headerName: 'Pcs', width: 90, type: 'number', editable: true },
-  {
-    field: 'ship',
-    headerName: 'Ship',
-    type: 'date',
-    width: 180,
-    editable: true,
-  }
-]
-
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
@@ -56,19 +43,51 @@ function Editor() {
   const classes = useStyles();
   
   const [rows, setRows] = useState([]);
+  const [modIds, setModifiedIds] = useState([]);
   
-  function getLargestId() {
-    let largestId = 0
-    for (let i=0; i<rows.length; i++) {
-      if (largestId < rows[i].id) {
-        largestId = rows[i].id
-      }
+  const columns = [
+    { field: 'id', headerName: 'Id', width: 380, editable: false, hide: true },
+    { field: 'sku', headerName: 'Sku', width: 90, editable: true },
+    { field: 'name', headerName: 'Name', width: 130, editable: true },
+    { field: 'pcs', headerName: 'Pcs', width: 90, type: 'number', editable: true },
+    {
+      field: 'ship',
+      headerName: 'Ship',
+      type: 'date',
+      width: 180,
+      editable: true,
+    },
+    { 
+      field: 'modified', 
+      headerName: 'Modified', 
+      width: 120, 
+      editable: false, 
+      type: 'boolean', 
+      valueGetter: isModified
+    },
+  ]
+  
+  function isModified(params) {
+    if (modIds.indexOf(params.id) == '-1') {
+      return false
+    } else {
+      return true
     }
-    return largestId
+  }
+
+  function deleteRows() {
+    console.log('deleteRows')
+    /*
+    try {
+      const response = await API.graphql(graphqlOperation(deleteFiction, {id: }));
+      console.log(response.data.deleteFiction)
+      doList()
+    } catch (err) { console.log('error deleteRow') }
+    */
   }
   
-  function deleteRow() {
-    console.log('deleteRow')
+  function saveRows() {
+    console.log('saveRows')
     /*
     try {
       const response = await API.graphql(graphqlOperation(deleteFiction, {id: }));
@@ -91,14 +110,16 @@ function Editor() {
     let newRows = [...rows]
     const dt = new Date()
     const now = `${dt.getFullYear()}/${(dt.getMonth()+1)}/${dt.getDate()}`
-    console.log(getLargestId())
-    const newId = getLargestId() + 1
+    const newId = `fiction-${uuidv1()}`
     newRows.push({
       id: newId,
-      name: `name-${newId}`,
+      name: '',
       age: 0,
       created: now,
     })
+    let newModIds = [...modIds]
+    newModIds.push(newId)
+    setModifiedIds(newModIds)
     setRows(newRows)
   }
   
@@ -155,12 +176,12 @@ function Editor() {
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
-            onClick={() => addRow()}
-            >Push Selected Rows
+            onClick={() => saveRows()}
+            >Save Selected Rows
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
-            onClick={() => deleteRow()}
+            onClick={() => deleteRows()}
             >Delete Selected Rows
           </Button>
         </Box>
