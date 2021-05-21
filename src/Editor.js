@@ -6,7 +6,7 @@ import {
   GridColumnsToolbarButton,
 } from '@material-ui/data-grid';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
@@ -14,8 +14,12 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
 import { listFictions } from './graphql/queries';
-import { deleteFiction } from './graphql/mutations';
+import { deleteFiction, batchPutFictions } from './graphql/mutations';
 import { v1 as uuidv1 } from 'uuid';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -39,6 +43,13 @@ function CustomToolbar() {
   )
 }
 
+function dateFormatter(params) {
+  const dt = new Date(params.value)
+  return (
+    `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
+  )
+}
+
 function Editor() {
   const classes = useStyles();
   
@@ -57,14 +68,15 @@ function Editor() {
       type: 'date',
       width: 120,
       editable: true,
+      valueFormatter: (params) => dateFormatter(params)
     },
     { 
       field: 'modified', 
-      headerName: 'Modified', 
+      headerName: 'Saved', 
       width: 120, 
       editable: false, 
       type: 'boolean', 
-      valueGetter: isModified
+      valueGetter: isSaved
     },
     { 
       field: 'delete', 
@@ -77,26 +89,27 @@ function Editor() {
           color="secondary"
           size="small"
           onClick={() => deleteRow(params)}
-          >Delete
+          >
+          <DeleteForeverIcon />
         </Button>
       )
     }
   ]
   
-  function isModified(params) {
+  function isSaved(params) {
     for (let i=0; i<modifiedRows.length; i++) {
       if (modifiedRows[i].id === params.id) {
-        return true
+        return false
       }
     }
-    return false
+    return true
   }
 
   async function deleteRow(params) {
     console.log('deleteRow', params)
     try {
       const response = await API.graphql(graphqlOperation(deleteFiction, {id: params.row.id}));
-      console.log(response)
+      console.log('deleteRow', response)
       let index = null
       for (let i=0; i<rows.length; i++) {
         if (rows[i].id === params.row.id) {
@@ -112,15 +125,27 @@ function Editor() {
     } catch (err) { console.log('error deleteFiction') }
   }
   
-  function putRow() {
-    console.log('putRow', selectedIds)
-    /*
+  async function putRows() {
+    let sendRows = []
+    for (let i=0; i<rows.length; i++) {
+      if (-1 < selectedIds.indexOf(rows[i].id)) {
+        const dt = new Date(rows[i].ship)
+        const ship = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
+        let row = {
+          id: rows[i].id,
+          sku: parseInt(rows[i].sku),
+          name: rows[i].name,
+          pcs: parseInt(rows[i].pcs),
+          ship: ship
+        }
+        sendRows.push(row)
+      }
+    }
+    console.log('putRows', sendRows)
     try {
-      const response = await API.graphql(graphqlOperation(deleteFiction, {id: }));
-      console.log(response.data.deleteFiction)
-      doList()
-    } catch (err) { console.log('error deleteRow') }
-    */
+      const response = await API.graphql(graphqlOperation(batchPutFictions, {fictions: sendRows}));
+      console.log(response.data.batchPutFictions)
+    } catch (err) { console.log('error putRows') }
   }
   
   async function doList() {
@@ -134,7 +159,7 @@ function Editor() {
   function addRow() {
     let newRows = [...rows]
     const dt = new Date()
-    const now = `${dt.getFullYear()}-${(dt.getMonth()+1)}-${dt.getDate()}`
+    const now = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+(dt.getDate()+1)).slice(-2)}`
     const newId = `fiction-${uuidv1()}`
     const row = {
       id: newId,
@@ -239,11 +264,19 @@ function Editor() {
             variant="contained" color="primary"
             onClick={() => doList()}
             >Pull Remote Rows
+            <CloudDownloadIcon />
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
             onClick={() => addRow()}
             >Add an Empty Row
+            <AddCircleIcon />
+          </Button>
+          <Button className={classes.button}
+            variant="contained" color="primary"
+            onClick={() => putRows()}
+            >Push Selected Rows
+            <CloudUploadIcon />
           </Button>
           <Button className={classes.button}
             variant="contained" color="primary"
