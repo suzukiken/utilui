@@ -1,7 +1,8 @@
 import React from 'react';
 import { graphqlOperation, API } from 'aws-amplify';
 import { listCrossStackReferences } from './graphql/queries';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUserContext } from './UserContext';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -245,10 +246,17 @@ function Row(props) {
 
 function ExportList() {
   const classes = useStyles();
+  const { userContext } = useUserContext()
   
   const [exportList, setExportList] = useState([]);
   const [showingList, setShowingList] = useState([]);
   const [searchWord, setSearchWord] = useState([]);
+  
+  useEffect(() => {
+    if (userContext && userContext.authenticated) {
+      doListCrossStackReferences()
+    }
+  }, [userContext])
   
   async function doListCrossStackReferences() {
     try {

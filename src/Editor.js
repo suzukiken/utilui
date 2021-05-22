@@ -1,25 +1,27 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useUserContext } from './UserContext';
+import { makeStyles } from '@material-ui/core/styles';
+import { Button, IconButton } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import {
   DataGrid,
   GridToolbarContainer,
   GridToolbarExport,
   GridColumnsToolbarButton,
 } from '@material-ui/data-grid';
-
-import { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
 import { listFictions } from './graphql/queries';
-import { deleteFiction, batchPutFictions } from './graphql/mutations';
+import { updateFiction, batchDeleteFictions, batchPutFictions } from './graphql/mutations';
 import { v1 as uuidv1 } from 'uuid';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Delete from '@material-ui/icons/Delete';
+import InfoIcon from '@material-ui/icons/Info';
+
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -52,10 +54,13 @@ function dateFormatter(params) {
 
 function Editor() {
   const classes = useStyles();
+  const { userContext } = useUserContext()
   
   const [rows, setRows] = useState([]);
   const [modifiedRows, setModifiedRows] = useState([]);
+  const [modifiedIds, setModifiedIds] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [selected, setSelected] = useState([]);
   
   const columns = [
     { field: 'id', headerName: 'Id', width: 380, editable: false, hide: true },
@@ -71,40 +76,66 @@ function Editor() {
       valueFormatter: (params) => dateFormatter(params)
     },
     { 
-      field: 'modified', 
+      field: 'saved', 
       headerName: 'Saved', 
-      width: 120, 
+      width: 140, 
       editable: false, 
-      type: 'boolean', 
-      valueGetter: isSaved
-    },
+      type: 'boolean',
+      valueGetter: isSaved,
+      renderCell: (params) => (
+        <IconButton 
+          aria-label="Upload" 
+          bgcolor="primary"
+          onClick={() => putRow(params)}
+          disabled={params.value}
+        >
+          <CloudUploadIcon />
+        </IconButton>
+      )
+    }
+    /*
     { 
       field: 'delete', 
       headerName: 'Delete', 
-      width: 100, 
+      width: 150, 
       editable: false, 
       renderCell: (params) => (
         <Button className={classes.button}
           variant="outlined"
           color="secondary"
           size="small"
+          startIcon={<DeleteForeverIcon />}
           onClick={() => deleteRow(params)}
-          >
-          <DeleteForeverIcon />
+          >Delete
         </Button>
       )
     }
+    */
   ]
   
-  function isSaved(params) {
-    for (let i=0; i<modifiedRows.length; i++) {
-      if (modifiedRows[i].id === params.id) {
-        return false
-      }
+  useEffect(() => {
+    if (userContext && userContext.authenticated) {
+      doList()
     }
-    return true
+  }, [userContext])
+  
+  useEffect(() => {
+    setSelected(selectedIds.length !== 0)
+  }, [selectedIds])
+  
+  useEffect(() => {
+    let newModifiedIds = []
+    for (let i=0; i<modifiedRows.length; i++) {
+      newModifiedIds.push(modifiedRows[i].id)
+    }
+    setModifiedIds(newModifiedIds)
+  }, [modifiedRows])
+  
+  function isSaved(params) {
+    return -1 === modifiedIds.indexOf(params.row.id)
   }
-
+  
+  /*
   async function deleteRow(params) {
     console.log('deleteRow', params)
     try {
@@ -123,6 +154,11 @@ function Editor() {
         setRows(newRows)
       }
     } catch (err) { console.log('error deleteFiction') }
+  }
+  */
+  
+  async function deleteRows() {
+    console.log('deleteRows')
   }
   
   async function putRows() {
@@ -148,11 +184,31 @@ function Editor() {
     } catch (err) { console.log('error putRows') }
   }
   
+  async function putRow(params) {
+    console.log('putRow', params)
+    const dt = new Date(params.row.ship)
+    const ship = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
+    const row = {
+      id: params.row.id,
+      sku: parseInt(params.row.sku),
+      name: params.row.name,
+      pcs: parseInt(params.row.pcs),
+      ship: ship
+    }
+    try {
+      const response = await API.graphql(graphqlOperation(updateFiction, {input: row}));
+      console.log(response)
+      //setRows(response.data.updateFiction)
+    } catch (err) { console.log('error putRow') }
+  }
+  
   async function doList() {
     try {
       const response = await API.graphql(graphqlOperation(listFictions));
       console.log(response)
       setRows(response.data.listFictions)
+      setModifiedRows([])
+      setSelectedIds([])
     } catch (err) { console.log('error listFictions') }
   }
   
@@ -245,7 +301,9 @@ function Editor() {
   function showStates() {
     console.log('rows', rows)
     console.log('modifiedRows', modifiedRows)
+    console.log('modifiedIds', modifiedIds)
     console.log('selectedIds', selectedIds)
+    console.log('selected', selected)
   }
   
   return (
@@ -262,27 +320,40 @@ function Editor() {
         <Box display="flex" justifyContent="center" m={2}>
           <Button className={classes.button}
             variant="contained" color="primary"
+            startIcon={<CloudDownloadIcon />}
             onClick={() => doList()}
-            >Pull Remote Rows
-            <CloudDownloadIcon />
+            >Init
           </Button>
-          <Button className={classes.button}
-            variant="contained" color="primary"
+          <IconButton 
+            aria-label="Add" 
+            color="primary"
             onClick={() => addRow()}
-            >Add an Empty Row
-            <AddCircleIcon />
-          </Button>
-          <Button className={classes.button}
-            variant="contained" color="primary"
+          >
+            <AddCircleIcon fontSize="large" />
+          </IconButton>
+          <IconButton 
+            aria-label="Push" 
+            color="primary"
             onClick={() => putRows()}
-            >Push Selected Rows
-            <CloudUploadIcon />
-          </Button>
-          <Button className={classes.button}
-            variant="contained" color="primary"
+            disabled={!selected}
+          >
+            <CloudUploadIcon fontSize="large" />
+          </IconButton>
+          <IconButton 
+            aria-label="Push" 
+            color="primary"
+            onClick={() => deleteRows()}
+            disabled={!selected}
+          >
+            <Delete fontSize="large" />
+          </IconButton>
+          <IconButton 
+            aria-label="Debug" 
+            color="primary"
             onClick={() => showStates()}
-            >Show States
-          </Button>
+          >
+            <InfoIcon />
+          </IconButton>
         </Box>
           <DataGrid 
             rows={rows} 

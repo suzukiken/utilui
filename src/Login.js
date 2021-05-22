@@ -3,6 +3,7 @@ import Amplify, { Auth, Hub } from 'aws-amplify';
 import { Button } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { useUserContext } from './UserContext';
 
 const useStyles = makeStyles((theme) => ({
   link: {
@@ -12,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Login() {
   const classes = useStyles();
+  const { setUserContext } = useUserContext()
   
   const [user, setUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
@@ -66,6 +68,7 @@ function Login() {
         const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
         console.log(jwtTokenPayload['cognito:username'])
         console.log(jwtTokenPayload['email'])
+        setUserContext({authenticated: true})
         return userData
       })
       .catch(() => console.log('Not signed in'));

@@ -1,4 +1,5 @@
 import React from 'react';
+import { UserProvider } from './UserContext';
 import Login from './Login';
 import Jwt from './Jwt';
 import ExportList from './ExportList';
@@ -67,43 +68,45 @@ export default function App() {
   const classes = useStyles();
 
   return (
-    <React.Fragment>
-      <CssBaseline />
-      <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          <Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
-            <Link href="/" color="inherit">
-              FigmentResearch
+    <UserProvider>
+      <React.Fragment>
+        <CssBaseline />
+        <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
+          <Toolbar className={classes.toolbar}>
+            <Typography variant="h6" color="inherit" noWrap className={classes.toolbarTitle}>
+              <Link href="/" color="inherit">
+                FigmentResearch
+              </Link>
+            </Typography>
+            <Link href="/jwt" className={classes.toolbarLink}>
+              JWT
             </Link>
-          </Typography>
-          <Link href="/jwt" className={classes.toolbarLink}>
-            JWT
-          </Link>
-          <Link href="/table" className={classes.toolbarLink}>
-            CFN
-          </Link>
-          <Link href="/editor" className={classes.toolbarLink}>
-            EDITOR
-          </Link>
-          <Login />
-        </Toolbar>
-      </AppBar>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/jwt">
-            <Jwt />
-          </Route>
-          <Route path="/table">
-            <Container maxWidth="lg" component="main" className={classes.container}>
-              <ExportList />
-            </Container>
-          </Route>
-          <Route path="/editor">
-            <Editor />
-          </Route>
-        </Switch>
-      </BrowserRouter>
-    </React.Fragment>
+            <Link href="/table" className={classes.toolbarLink}>
+              CFN
+            </Link>
+            <Link href="/editor" className={classes.toolbarLink}>
+              EDITOR
+            </Link>
+            <Login />
+          </Toolbar>
+        </AppBar>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/jwt">
+              <Jwt />
+            </Route>
+            <Route path="/table">
+              <Container maxWidth="lg" component="main" className={classes.container}>
+                <ExportList />
+              </Container>
+            </Route>
+            <Route path="/editor">
+              <Editor />
+            </Route>
+          </Switch>
+        </BrowserRouter>
+      </React.Fragment>
+    </UserProvider>
   );
 }
 
