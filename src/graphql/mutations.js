@@ -41,3 +41,10 @@ export const batchPutFictions = /* GraphQL */ `
     }
   }
 `;
+export const putEvent = /* GraphQL */ `
+  mutation PutEvent($message: String) {
+    putEvent(message: $message) {
+      message
+    }
+  }
+`;
