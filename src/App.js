@@ -2,7 +2,6 @@ import React from 'react';
 import { UserProvider } from './UserContext';
 import Login from './Login';
 import Jwt from './Jwt';
-import Respond from './Respond';
 import Search from './Search';
 import Notify from './Notify';
 import ExportList from './ExportList';
@@ -90,9 +89,6 @@ export default function App() {
             <Link href="/editor" className={classes.toolbarLink}>
               EDITOR
             </Link>
-            <Link href="/respond" className={classes.toolbarLink}>
-              RESPOND
-            </Link>
             <Link href="/notify" className={classes.toolbarLink}>
               NOTIFY
             </Link>
@@ -114,9 +110,6 @@ export default function App() {
             </Route>
             <Route path="/editor">
               <Editor />
-            </Route>
-            <Route path="/respond">
-              <Respond />
             </Route>
             <Route path="/search">
               <Search />

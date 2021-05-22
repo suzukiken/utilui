@@ -389,18 +389,18 @@ function Editor() {
             >Reset
           </Button>
         </Box>
-          <DataGrid 
-            rows={rows} 
-            columns={columns}
-            onEditCellChangeCommitted={handleEditCellChangeCommitted}
-            onSelectionModelChange={handleSelectionModelChange}
-            pageSize="10"
-            components={{
-              Toolbar: CustomToolbar,
-            }}
-            checkboxSelection
-            disableSelectionOnClick
-          />
+        <DataGrid 
+          rows={rows} 
+          columns={columns}
+          onEditCellChangeCommitted={handleEditCellChangeCommitted}
+          onSelectionModelChange={handleSelectionModelChange}
+          pageSize="10"
+          components={{
+            Toolbar: CustomToolbar,
+          }}
+          checkboxSelection
+          disableSelectionOnClick
+        />
       </Container>
     </React.Fragment> 
   );
