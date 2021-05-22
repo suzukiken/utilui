@@ -76,16 +76,16 @@ function Editor() {
       valueFormatter: (params) => dateFormatter(params)
     },
     { 
-      field: 'saved', 
-      headerName: 'Saved', 
-      width: 140, 
+      field: 'save', 
+      headerName: 'Save', 
+      width: 100, 
       editable: false, 
       type: 'boolean',
       valueGetter: isSaved,
       renderCell: (params) => (
         <IconButton 
           aria-label="Upload" 
-          bgcolor="primary"
+          color="primary"
           onClick={() => putRow(params)}
           disabled={params.value}
         >
@@ -93,24 +93,6 @@ function Editor() {
         </IconButton>
       )
     }
-    /*
-    { 
-      field: 'delete', 
-      headerName: 'Delete', 
-      width: 150, 
-      editable: false, 
-      renderCell: (params) => (
-        <Button className={classes.button}
-          variant="outlined"
-          color="secondary"
-          size="small"
-          startIcon={<DeleteForeverIcon />}
-          onClick={() => deleteRow(params)}
-          >Delete
-        </Button>
-      )
-    }
-    */
   ]
   
   useEffect(() => {
@@ -135,70 +117,123 @@ function Editor() {
     return -1 === modifiedIds.indexOf(params.row.id)
   }
   
-  /*
-  async function deleteRow(params) {
-    console.log('deleteRow', params)
-    try {
-      const response = await API.graphql(graphqlOperation(deleteFiction, {id: params.row.id}));
-      console.log('deleteRow', response)
-      let index = null
-      for (let i=0; i<rows.length; i++) {
-        if (rows[i].id === params.row.id) {
-          index = i
-          break
-        }
-      }
-      if (index != null) {
-        let newRows = [...rows]
-        newRows.splice(index, 1);
-        setRows(newRows)
-      }
-    } catch (err) { console.log('error deleteFiction') }
-  }
-  */
-  
   async function deleteRows() {
     console.log('deleteRows')
+    try {
+      const response = await API.graphql(graphqlOperation(batchDeleteFictions, {ids: selectedIds}));
+      console.log('deleteRows', response)
+      let newRows = []
+      for (let i=0; i<rows.length; i++) {
+        if (-1 === selectedIds.indexOf(rows[i].id)) {
+          newRows.push(rows[i])
+        }
+      }
+      setRows(newRows)
+    } catch (err) { console.log('error deleteFiction') }
   }
   
   async function putRows() {
     let sendRows = []
-    for (let i=0; i<rows.length; i++) {
-      if (-1 < selectedIds.indexOf(rows[i].id)) {
-        const dt = new Date(rows[i].ship)
-        const ship = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
-        let row = {
-          id: rows[i].id,
-          sku: parseInt(rows[i].sku),
-          name: rows[i].name,
-          pcs: parseInt(rows[i].pcs),
-          ship: ship
+    for (let i=0; i<modifiedRows.length; i++) {
+      if (-1 < selectedIds.indexOf(modifiedRows[i].id)) {
+        for (let r=0; r<rows.length; r++) {
+          if (modifiedRows[i].id === rows[r].id) {
+            let sendRow = {...rows[r]}
+            for (let k in modifiedRows[i]) {
+              sendRow[k] = modifiedRows[i][k]
+            }
+            delete sendRow.added
+            const dt = new Date(sendRow.ship)
+            sendRow.ship = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
+            sendRow.sku = parseInt(sendRow.sku)
+            sendRow.pcs = parseInt(sendRow.pcs)
+            sendRows.push(sendRow)
+          }
         }
-        sendRows.push(row)
       }
     }
     console.log('putRows', sendRows)
     try {
       const response = await API.graphql(graphqlOperation(batchPutFictions, {fictions: sendRows}));
-      console.log(response.data.batchPutFictions)
+      console.log('batchPutFictions', response.data.batchPutFictions)
+      const fictions = response.data.batchPutFictions
+      const newRows = [...rows]
+      const newModifiedRows = [...modifiedRows]
+      for (let i=0; i<fictions.length; i++) {
+        for (let r=0; r<newRows.length; r++) {
+          if (newRows[r].id === fictions[i].id) {
+            newRows[r].sku = fictions[i].sku
+            newRows[r].name = fictions[i].name
+            newRows[r].pcs = fictions[i].pcs
+            newRows[r].ship = fictions[i].ship
+          }
+        }
+        let idx = -1
+        for (let r=0; r<newModifiedRows.length; r++) {
+          if (newModifiedRows[r].id === fictions[i].id) {
+            idx = r
+            break
+          }
+        }
+        if (-1 < idx) {
+          newModifiedRows.splice(idx, 1)
+        }
+      }
+      setRows(newRows)
+      setModifiedRows(newModifiedRows)
     } catch (err) { console.log('error putRows') }
   }
   
   async function putRow(params) {
     console.log('putRow', params)
-    const dt = new Date(params.row.ship)
+    let modifedRow = {}
+    let saveRow = params.row
+    for (let i=0; i<modifiedRows.length; i++) {
+      if (modifiedRows[i].id === params.row.id) {
+        modifedRow = modifiedRows[i]
+        break
+      }
+    }
+    for (let k in modifedRow) {
+      saveRow[k] = modifedRow[k]
+    }
+    delete saveRow.added
+    const dt = new Date(saveRow.ship)
     const ship = `${dt.getFullYear()}-${("0"+(dt.getMonth()+1)).slice(-2)}-${("0"+dt.getDate()).slice(-2)}`
     const row = {
-      id: params.row.id,
-      sku: parseInt(params.row.sku),
-      name: params.row.name,
-      pcs: parseInt(params.row.pcs),
+      id: saveRow.id,
+      sku: parseInt(saveRow.sku),
+      name: saveRow.name,
+      pcs: parseInt(saveRow.pcs),
       ship: ship
     }
     try {
       const response = await API.graphql(graphqlOperation(updateFiction, {input: row}));
-      console.log(response)
-      //setRows(response.data.updateFiction)
+      console.log(response.data.updateFiction)
+      const fiction = response.data.updateFiction
+      const newRows = [...rows]
+      const newModifiedRows = [...modifiedRows]
+      for (let i=0; i<newRows.length; i++) {
+        if (newRows[i].id === fiction.id) {
+          newRows[i].sku = fiction.sku
+          newRows[i].name = fiction.name
+          newRows[i].pcs = fiction.pcs
+          newRows[i].ship = fiction.ship
+          break
+        }
+      }
+      let idx = -1
+      for (let i=0; i<newModifiedRows.length; i++) {
+        if (newModifiedRows[i].id === fiction.id) {
+          idx = i
+          break
+        }
+      }
+      if (-1 < idx) {
+        newModifiedRows.splice(idx, 1)
+      }
+      setRows(newRows)
+      setModifiedRows(newModifiedRows)
     } catch (err) { console.log('error putRow') }
   }
   
@@ -220,7 +255,7 @@ function Editor() {
     const row = {
       id: newId,
       sku: 0,
-      name: '',
+      name: 'UNTITLED',
       pcs: 0,
       ship: now,
     }
@@ -318,18 +353,12 @@ function Editor() {
       </Container>
       <Container maxWidth="md" className={classes.datagridContainer}>
         <Box display="flex" justifyContent="center" m={2}>
-          <Button className={classes.button}
-            variant="contained" color="primary"
-            startIcon={<CloudDownloadIcon />}
-            onClick={() => doList()}
-            >Init
-          </Button>
           <IconButton 
             aria-label="Add" 
             color="primary"
             onClick={() => addRow()}
           >
-            <AddCircleIcon fontSize="large" />
+            <AddCircleIcon fontSize="medium" />
           </IconButton>
           <IconButton 
             aria-label="Push" 
@@ -337,23 +366,28 @@ function Editor() {
             onClick={() => putRows()}
             disabled={!selected}
           >
-            <CloudUploadIcon fontSize="large" />
+            <CloudUploadIcon fontSize="medium" />
           </IconButton>
           <IconButton 
-            aria-label="Push" 
-            color="primary"
+            aria-label="Delete" 
+            color="secondary"
             onClick={() => deleteRows()}
             disabled={!selected}
           >
-            <Delete fontSize="large" />
+            <Delete fontSize="medium" />
           </IconButton>
           <IconButton 
             aria-label="Debug" 
-            color="primary"
             onClick={() => showStates()}
           >
             <InfoIcon />
           </IconButton>
+          <Button className={classes.button}
+            variant="outlined"
+            startIcon={<CloudDownloadIcon />}
+            onClick={() => doList()}
+            >Reset
+          </Button>
         </Box>
           <DataGrid 
             rows={rows} 
