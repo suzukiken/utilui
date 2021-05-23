@@ -14,16 +14,16 @@ import { makeStyles } from '@material-ui/core/styles';
 import { DataGrid } from '@material-ui/data-grid';
 import { v1 as uuidv1 } from 'uuid';
 
+//.toISOString()
+
 const useStyles = makeStyles((theme) => ({
   heroContent: {
     padding: theme.spacing(6, 0),
   },
-  input: {
-    marginLeft: theme.spacing(1),
-    flex: 1,
+  textFieldBox: {
   },
-  iconButton: {
-    padding: 10,
+  buttonBox: {
+    padding: theme.spacing(0, 2),
   },
   datagridContainer: {
     height: 500,
@@ -33,10 +33,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function Notify() {
+  const LOCALSTORAGE_KEY = 'm3'
   const classes = useStyles();
   const [openBar, setOpenBar] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
-  const [receivedMessage, setReceivedMessage] = useState("");
+  const [barMessage, setBarMessage] = useState("");
   const [receivedMessages, setReceivedMessages] = useState([]);
 
   const columns = [
@@ -44,50 +45,74 @@ function Notify() {
     {
       field: 'created',
       headerName: 'Created',
-      type: 'datetime',
-      width: 200,
-      editable: false
+      width: 250,
+      editable: false,
+      valueFormatter: (params) => (new Date(params.value)),
     }
   ]
   
   useEffect(() => {
+    let storagedMessages = window.localStorage.getItem(LOCALSTORAGE_KEY)
+    if (!storagedMessages) {
+      storagedMessages = []
+    } else {
+      storagedMessages = JSON.parse(storagedMessages)
+    }
+    console.log(storagedMessages)
+    setReceivedMessages(storagedMessages)
+  }, [])
+  
+  
+  useEffect(() => {
+    console.log('subscription')
     const subscription = API.graphql(
       graphqlOperation(eventHappened)
     ).subscribe({
       next: ({ provider, value }) => {
         console.log({ provider, value })
-        setReceivedMessage(value.data.eventHappened.message)
+        setBarMessage(value.data.eventHappened.message)
         setOpenBar(true)
-        const newReceivedMessages = [...receivedMessages]
+        
         const dt = new Date()
-        newReceivedMessages.push({
+        const newMessage = {
           id: uuidv1(),
           message: value.data.eventHappened.message,
-          created: dt.toISOString()
-        })
+          created: dt / 1000 * 1000
+        }
+        
+        console.log(newMessage)
+        
+        let storagedMessages = window.localStorage.getItem(LOCALSTORAGE_KEY)
+        if (!storagedMessages) {
+          storagedMessages = []
+        } else {
+          storagedMessages = JSON.parse(storagedMessages)
+        }
+        console.log(storagedMessages)
+        const newStoragedMessages = [...storagedMessages]
+        newStoragedMessages.push(newMessage)
+        window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(newStoragedMessages))
+        
+        
+        const newReceivedMessages = [...receivedMessages]
+
+        newReceivedMessages.push(newMessage)
+        console.log(newReceivedMessages)
         setReceivedMessages(newReceivedMessages)
       },
       error: error => console.warn(error)
     })
     return () => {
+      console.log('unsubscribe')
       subscription.unsubscribe();
     }
-  })
+  }, [receivedMessages])
   
   async function doPutEvent() {
-    let messages = window.localStorage.getItem('mess1')
-    if (!messages) {
-      messages = []
-    } else {
-      messages = JSON.parse(messages)
-    }
-    console.log(messages)
-    const newMessages = [...messages]
-    newMessages.push(inputMessage)
-    window.localStorage.setItem('mess1', JSON.stringify(newMessages))
     try {
       const response = await API.graphql(graphqlOperation(putEvent, {message: inputMessage}))
       console.log(response)
+      setInputMessage('')
     } catch (err) { console.log('error doPutEvent') }
   }
 
@@ -109,21 +134,25 @@ function Notify() {
         </Typography>
       </Container>
       <Box display="flex" justifyContent="center">
-        <TextField 
-          id="outlined-basic" 
-          label="message" 
-          autoFocus
-          autoComplete
-          value={inputMessage}
-          onChange={(event) => setInputMessage(event.target.value)}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => doPutEvent()}
-          >PutEvent
-        </Button>
+        <Box className={classes.textFieldBox}>
+          <TextField 
+            label="message" 
+            autoFocus
+            autoComplete
+            variant="outlined"
+            size="small"
+            value={inputMessage}
+            onChange={(event) => setInputMessage(event.target.value)}
+          />
+        </Box>
+        <Box className={classes.buttonBox}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => doPutEvent()}
+            >PutEvent
+          </Button>
+        </Box>
       </Box>
       <Snackbar
         anchorOrigin={{
@@ -133,7 +162,7 @@ function Notify() {
         open={openBar}
         autoHideDuration={2000}
         onClose={handleCloseBar}
-        message={receivedMessage}
+        message={barMessage}
         action={
           <IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseBar}>
             <CloseIcon fontSize="small" />
@@ -144,7 +173,13 @@ function Notify() {
         <DataGrid 
           rows={receivedMessages} 
           columns={columns}
-          pageSize="10"
+          pageSize="100"
+          sortModel={[
+            {
+              field: 'created',
+              sort: 'desc',
+            },
+          ]}
         />
       </Container>
     </div>
@@ -154,3 +189,6 @@ function Notify() {
 export default Notify
 
 
+/*
+
+*/
