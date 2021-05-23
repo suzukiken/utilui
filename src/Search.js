@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
-    width: 800,
+    width: 700,
   },
   input: {
     marginLeft: theme.spacing(1),
@@ -84,6 +84,7 @@ function Search() {
   function handleInputChange(event) {
     console.log(event)
     setInputText(event.target.value)
+    doSearch()
   }
 
   return (
@@ -107,6 +108,12 @@ function Search() {
             inputProps={{ 'aria-label': 'search' }}
             onChange={handleInputChange}
             value={inputText}
+            onKeyDown={e => {
+              if (e.keyCode === 13) {
+                console.log(e.target.value);
+                doSearch(e)
+              }
+            }}
           />
           <IconButton className={classes.iconButton} aria-label="search" onClick={doSearch}>
             <SearchIcon />
