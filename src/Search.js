@@ -1,3 +1,7 @@
+import { graphqlOperation, API } from 'aws-amplify';
+import { listProducts, searchProduct } from './graphql/queries';
+import { useState, useEffect } from 'react';
+import { useUserContext } from './UserContext';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
@@ -5,15 +9,17 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import React from 'react';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -36,12 +42,17 @@ const useStyles = makeStyles((theme) => ({
     height: 28,
     margin: theme.spacing(0, 2, 0, 0),
   },
+  tableContainer: {
+    margin: theme.spacing(2, 0, 10),
+  }
 }))
 
 
 function Search() {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState({
+  const [inputText, setInputText] = useState("")
+  const [products, setProducts] = useState([])
+  const [checked, setChecked] = useState({
     a: false,
     b: false,
     c: false,
@@ -52,6 +63,27 @@ function Search() {
     const newChecked = {...checked}
     newChecked[handleChange.target.value] = !newChecked[handleChange.target.value]
     setChecked(newChecked)
+  }
+  
+  async function doSearch() {
+    try {
+      const response = await API.graphql(graphqlOperation(searchProduct, {title: inputText}));
+      console.log(response)
+      setProducts(response.data.searchProduct)
+    } catch (err) { console.log('error doSearch') }
+  }
+  
+  async function doList() {
+    try {
+      const response = await API.graphql(graphqlOperation(listProducts));
+      console.log(response)
+      setProducts(response.data.listProducts)
+    } catch (err) { console.log('error doList') }
+  }
+  
+  function handleInputChange(event) {
+    console.log(event)
+    setInputText(event.target.value)
   }
 
   return (
@@ -65,16 +97,18 @@ function Search() {
         </Typography>
       </Container>
       <Box display="flex" justifyContent="center">
-        <Paper component="form" className={classes.root}>
-          <IconButton className={classes.iconButton} aria-label="menu">
+        <Paper className={classes.root}>
+          <IconButton className={classes.iconButton} aria-label="menu" onClick={doList}>
             <MenuIcon />
           </IconButton>
           <InputBase
             className={classes.input}
-            placeholder="Search Google Maps"
-            inputProps={{ 'aria-label': 'search google maps' }}
+            placeholder="Search"
+            inputProps={{ 'aria-label': 'search' }}
+            onChange={handleInputChange}
+            value={inputText}
           />
-          <IconButton type="submit" className={classes.iconButton} aria-label="search">
+          <IconButton className={classes.iconButton} aria-label="search" onClick={doSearch}>
             <SearchIcon />
           </IconButton>
           <Divider className={classes.divider} orientation="vertical" mr={2} />
@@ -118,6 +152,26 @@ function Search() {
           </Box>
         </Paper>
       </Box>
+      <Container maxWidth="sm" component="main" className={classes.heroContent}>
+        <TableContainer component={Paper} className={classes.tableContainer}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Id</TableCell>
+                <TableCell>Title</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {products.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row.title}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
     </div>
   )
 }

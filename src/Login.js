@@ -61,13 +61,9 @@ function Login() {
   function getUser() {
     return Auth.currentAuthenticatedUser()
       .then(userData => {
-        console.log('userData', userData)
-        console.log(userData.attributes.email)
         const jwtToken = userData.signInUserSession.idToken.jwtToken
         setJwt(jwtToken)
-        const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
-        console.log(jwtTokenPayload['cognito:username'])
-        console.log(jwtTokenPayload['email'])
+        // const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
         setUserContext({authenticated: true})
         return userData
       })

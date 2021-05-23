@@ -53,3 +53,19 @@ export const listFictions = /* GraphQL */ `
     }
   }
 `;
+export const searchProduct = /* GraphQL */ `
+  query SearchProduct($title: String!) {
+    searchProduct(title: $title) {
+      id
+      title
+    }
+  }
+`;
+export const listProducts = /* GraphQL */ `
+  query ListProducts {
+    listProducts {
+      id
+      title
+    }
+  }
+`;
