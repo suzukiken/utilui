@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
+import './App.css';
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
