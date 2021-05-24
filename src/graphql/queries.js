@@ -61,6 +61,14 @@ export const searchProduct = /* GraphQL */ `
     }
   }
 `;
+export const searchProductPhrase = /* GraphQL */ `
+  query SearchProductPhrase($title: String!) {
+    searchProductPhrase(title: $title) {
+      id
+      title
+    }
+  }
+`;
 export const listProducts = /* GraphQL */ `
   query ListProducts {
     listProducts {

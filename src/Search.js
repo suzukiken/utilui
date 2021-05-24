@@ -1,5 +1,5 @@
 import { graphqlOperation, API } from 'aws-amplify';
-import { listProducts, searchProduct } from './graphql/queries';
+import { listProducts, searchProductPhrase } from './graphql/queries';
 import { useState, useEffect } from 'react';
 import { useUserContext } from './UserContext';
 import { makeStyles } from '@material-ui/core/styles';
@@ -21,6 +21,21 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
+import algoliasearch from 'algoliasearch/lite';
+import { InstantSearch, SearchBox, Hits } from 'react-instantsearch-dom';
+
+const searchClient = algoliasearch('8JKRPB5KDB', '02b5bfae746c4433d6fdb918664cbe18');
+
+function Search() {
+  return (
+    <InstantSearch searchClient={searchClient} indexName="articles">
+      <SearchBox />
+      <Hits />
+    </InstantSearch>
+  )
+}
+
+/*
 const useStyles = makeStyles((theme) => ({
   heroContent: {
     padding: theme.spacing(6, 0),
@@ -67,9 +82,9 @@ function Search() {
   
   async function doSearch() {
     try {
-      const response = await API.graphql(graphqlOperation(searchProduct, {title: inputText}));
+      const response = await API.graphql(graphqlOperation(searchProductPhrase, {title: inputText}));
       console.log(response)
-      setProducts(response.data.searchProduct)
+      setProducts(response.data.searchProductPhrase)
     } catch (err) { console.log('error doSearch') }
   }
   
@@ -182,7 +197,7 @@ function Search() {
     </div>
   )
 }
-
+*/
 export default Search
 
 
