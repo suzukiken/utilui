@@ -20,18 +20,110 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-
 import algoliasearch from 'algoliasearch/lite';
-import { InstantSearch, SearchBox, Hits } from 'react-instantsearch-dom';
+import { InstantSearch, SearchBox, Hits, connectSearchBox, connectHitInsights } from 'react-instantsearch-dom';
+
+//const HitWithInsights = connectHitInsights(window.aa)(Hit);
 
 const searchClient = algoliasearch('8JKRPB5KDB', '02b5bfae746c4433d6fdb918664cbe18');
 
+const CustomSearchBox = connectSearchBox(MaterialUiSearchBox);
+
+
+const useStyles = makeStyles((theme) => ({
+  heroContent: {
+    padding: theme.spacing(6, 0),
+  },
+  root: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: 700,
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  divider: {
+    height: 28,
+    margin: theme.spacing(0, 2, 0, 0),
+  },
+  tableContainer: {
+    margin: theme.spacing(2, 0, 10),
+  }
+}))
+
 function Search() {
+  const classes = useStyles();
   return (
-    <InstantSearch searchClient={searchClient} indexName="articles">
-      <SearchBox />
-      <Hits />
-    </InstantSearch>
+    <div>
+      <Container maxWidth="sm" component="main" className={classes.heroContent}>
+        <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+          Search
+        </Typography>
+        <Typography variant="h5" align="center" color="textSecondary" component="p">
+          by Algolia
+        </Typography>
+      </Container>
+      <InstantSearch searchClient={searchClient} indexName="articles">
+        <Box display="flex" justifyContent="center">
+          <Paper className={classes.root}>
+            <CustomSearchBox className="searchbox" />
+          </Paper>
+        </Box>
+        <Container maxWidth="lg" component="main" className={classes.heroContent}>
+          <TableContainer component={Paper} className={classes.tableContainer}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>filename</TableCell>
+                  <TableCell>Content</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <Hits hitComponent={Hit} />
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
+      </InstantSearch>
+    </div>
+  )
+}
+
+function MaterialUiSearchBox({currentRefinement, isSearchStalled, refine}) {
+  const classes = useStyles();
+  return (
+    <div>
+      <IconButton className={classes.iconButton} aria-label="search">
+        <SearchIcon />
+      </IconButton>
+      <InputBase
+        className={classes.input}
+        placeholder="Search…"
+        inputProps={{ "aria-label": "search" }}
+        value={currentRefinement}
+        onChange={(e) => refine(e.target.value)}
+        searchAsYouType={false}
+      />
+    </div>
+  )
+}
+
+function Hit({ hit, insights }) {
+  const classes = useStyles();
+  return (
+    <TableRow>
+      <TableCell>{hit.date}</TableCell>
+      <TableCell>{hit.title}</TableCell>
+      <TableCell>{hit.filename}</TableCell>
+      <TableCell>{hit.content}</TableCell>
+    </TableRow>
   )
 }
 
