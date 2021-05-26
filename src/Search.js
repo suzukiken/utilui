@@ -150,9 +150,9 @@ function MaterialUiHits({ hits }) {
   const classes = useStyles();
   
   function handleClick(hit) {
-    window.open('https://note.figmentresearch.com/aws/' + hit.filename.replace('.md', '/'))
+    window.open('/article/aws/' + hit.filename)
   }
-  
+
   return (
     <TableBody>
       {hits.map(hit => (

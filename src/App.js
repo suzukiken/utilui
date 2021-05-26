@@ -6,6 +6,7 @@ import Search from './Search';
 import Notify from './Notify';
 import ExportList from './ExportList';
 import Editor from './Editor';
+import Articles from './Articles';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -93,8 +94,11 @@ export default function App() {
             <Link href="/notify" className={classes.toolbarLink}>
               NOTIFY
             </Link>
-            <Link href="/SEARCH" className={classes.toolbarLink}>
+            <Link href="/search" className={classes.toolbarLink}>
               SEARCH
+            </Link>
+            <Link href="/articles" className={classes.toolbarLink}>
+              ARTICLES
             </Link>
             <Login />
           </Toolbar>
@@ -118,6 +122,12 @@ export default function App() {
             <Route path="/notify">
               <Notify />
             </Route>
+            <Route path="/articles">
+              <Articles />
+            </Route>
+            <Route path="/article/:id">
+              <Articles />
+            </Route>
           </Switch>
         </BrowserRouter>
       </React.Fragment>
@@ -125,3 +135,4 @@ export default function App() {
   );
 }
 
+//  children={<Articles />}

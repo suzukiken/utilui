@@ -77,3 +77,14 @@ export const listProducts = /* GraphQL */ `
     }
   }
 `;
+export const listArticles = /* GraphQL */ `
+  query ListArticles($limit: Int) {
+    listArticles(limit: $limit) {
+      id
+      content
+      date
+      tags
+      title
+    }
+  }
+`;
