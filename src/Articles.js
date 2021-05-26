@@ -6,7 +6,7 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
-import { listArticles } from './graphql/queries';
+import { get, listArticles } from './graphql/queries';
 import Markdown from 'markdown-to-jsx';
 import { useParams } from "react-router-dom";
 
@@ -37,14 +37,29 @@ function Articles() {
   
   useEffect(() => {
     if (userContext && userContext.authenticated) {
-      doListArticles()
+      if (id) {
+        doGet()
+      } else {
+        doListArticles()
+      }
     }
   }, [userContext])
+  
+  async function doGet() {
+    console.log('doGet')
+    try {
+      const response = await API.graphql(graphqlOperation(get, {id: "blog/" + id}));
+      console.log(response.data.get)
+      let newContents = []
+      newContents.push(response.data.get)
+      //setContents(newContents)
+    } catch (err) { console.log('error doGet') }
+  }
   
   async function doListArticles() {
     console.log('doListArticles')
     try {
-      const response = await API.graphql(graphqlOperation(listArticles, {limit: 3}));
+      const response = await API.graphql(graphqlOperation(listArticles, {limit: 10}));
       console.log(response.data.listArticles)
       setContents(response.data.listArticles)
     } catch (err) { console.log('error listArticles') }

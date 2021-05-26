@@ -150,7 +150,7 @@ function MaterialUiHits({ hits }) {
   const classes = useStyles();
   
   function handleClick(hit) {
-    window.open('/article/aws/' + hit.filename)
+    window.open('/article/' + hit.filename)
   }
 
   return (
