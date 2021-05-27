@@ -77,10 +77,43 @@ export const listProducts = /* GraphQL */ `
     }
   }
 `;
+export const getArticle = /* GraphQL */ `
+  query GetArticle($id: String) {
+    getArticle(id: $id) {
+      id
+      content
+      date
+      tags
+      title
+    }
+  }
+`;
 export const listArticles = /* GraphQL */ `
   query ListArticles($limit: Int) {
     listArticles(limit: $limit) {
       id
+      content
+      date
+      tags
+      title
+    }
+  }
+`;
+export const searchArticles = /* GraphQL */ `
+  query SearchArticles($word: String) {
+    searchArticles(word: $word) {
+      id
+      content
+      date
+      tags
+      title
+    }
+  }
+`;
+export const searchArticlesEs = /* GraphQL */ `
+  query SearchArticlesEs($word: String) {
+    searchArticlesEs(word: $word) {
+      filename
       content
       date
       tags

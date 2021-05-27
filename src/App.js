@@ -3,6 +3,7 @@ import { UserProvider } from './UserContext';
 import Login from './Login';
 import Jwt from './Jwt';
 import Search from './Search';
+import SearchElastic from './SearchElastic';
 import Notify from './Notify';
 import ExportList from './ExportList';
 import Editor from './Editor';
@@ -100,6 +101,9 @@ export default function App() {
             <Link href="/articles" className={classes.toolbarLink}>
               ARTICLES
             </Link>
+            <Link href="/elasticsearch" className={classes.toolbarLink}>
+              ELASTICSEARCH
+            </Link>
             <Login />
           </Toolbar>
         </AppBar>
@@ -127,6 +131,9 @@ export default function App() {
             </Route>
             <Route path="/article/:id">
               <Articles />
+            </Route>
+            <Route path="/elasticsearch">
+              <SearchElastic />
             </Route>
           </Switch>
         </BrowserRouter>

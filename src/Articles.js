@@ -6,7 +6,7 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
-import { get, listArticles } from './graphql/queries';
+import { getArticle, listArticles } from './graphql/queries';
 import Markdown from 'markdown-to-jsx';
 import { useParams } from "react-router-dom";
 
@@ -48,11 +48,11 @@ function Articles() {
   async function doGet() {
     console.log('doGet')
     try {
-      const response = await API.graphql(graphqlOperation(get, {id: "blog/" + id}));
-      console.log(response.data.get)
+      const response = await API.graphql(graphqlOperation(getArticle, {id: "blog/" + id}));
+      console.log(response.data.getArticle)
       let newContents = []
-      newContents.push(response.data.get)
-      //setContents(newContents)
+      newContents.push(response.data.getArticle)
+      setContents(newContents)
     } catch (err) { console.log('error doGet') }
   }
   
