@@ -49,6 +49,7 @@ function SearchErastic() {
   const [loading, setLoading] = useState(false);
   const [inputText, setInputText] = useState("")
   const [articles, setArticles] = useState([])
+  const [lanks, setLanks] = useState({})
   
   async function doSearch() {
     try {
@@ -62,6 +63,11 @@ function SearchErastic() {
       setLoading(false)
       console.log(response)
       setArticles(response.data.searchBlogs)
+      const newLanks = {}
+      for (let i=0; i<response.data.searchBlogs.length; i++) {
+        newLanks[response.data.searchBlogs[i].id] = response.data.searchBlogs[i].lank
+      }
+      setLanks(newLanks)
     } catch (err) { console.log('error doSearch') }
   }
   
@@ -71,17 +77,34 @@ function SearchErastic() {
     // doSearch()
   }
   
-  async function handleSlideChange(event, id) {
-    console.log(handleSlideChange, event, id)
+  function getLank(id) {
+    if (id in lanks) {
+      return lanks[id]
+    }
+    return 0
+  }
+  
+  async function handleSlideChange(event, value, id) {
+    console.log('handleSlideChange', event, value, id)
+    const newLanks = {...lanks}
+    newLanks[id] = value
+    setLanks(newLanks)
+  }
+  
+  async function handleSlideCommitted(event, value, id) {
+    console.log('handleSlideCommitted', event, value, id)
     try {
       const response = await API.graphql(graphqlOperation(updateBlogLank, {
         input: {
           id: id,
-          lank: parseInt(event.target.ariaValueNow)
+          lank: value
         }
       }));
       console.log(response)
-    } catch (err) { console.log('error doSearch') }
+      const newLanks = {...lanks}
+      newLanks[response.data.updateBlogLank.id] = response.data.updateBlogLank.lank
+      setLanks(newLanks)
+    } catch (err) { console.log('error updateBlogLank') }
   }
   
   function HighlightedContent(props) {
@@ -136,14 +159,15 @@ function SearchErastic() {
               </Typography>
               <Slider
                 className={classes.slider}
-                value={row.lank}
+                value={getLank(row.id)}
                 aria-labelledby="discrete-slider"
                 valueLabelDisplay="auto"
                 step={1}
                 marks
                 min={0}
                 max={5}
-                onChangeCommitted={e  => handleSlideChange(e, row.id)}
+                onChange={(e, v) => handleSlideChange(e, v, row.id)}
+                onChangeCommitted={(e, v) => handleSlideCommitted(e, v, row.id)}
               />
             </Box>
             <HighlightedContent highlight={row.highlight} />
