@@ -1,25 +1,17 @@
 import { graphqlOperation, API } from 'aws-amplify';
-import { listProducts, searchArticlesEs } from './graphql/queries';
-import { useState, useEffect } from 'react';
-import { useUserContext } from './UserContext';
+import { searchBlogs } from './graphql/queries';
+import { updateBlogLank } from './graphql/mutations';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Slider from '@material-ui/core/Slider';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -38,70 +30,84 @@ const useStyles = makeStyles((theme) => ({
   iconButton: {
     padding: 10,
   },
-  divider: {
-    height: 28,
-    margin: theme.spacing(0, 2, 0, 0),
+  blogTitle: {
+    margin: theme.spacing(3, 0, 0),
   },
-  tableContainer: {
-    margin: theme.spacing(2, 0, 10),
+  blogContent: {
+    margin: theme.spacing(0.5, 0, 0),
+  },
+  blogContainer: {
+    padding: theme.spacing(5, 0),
+  },
+  slider: {
+    width: 150
   }
 }))
 
-
 function SearchErastic() {
   const classes = useStyles();
+  const [loading, setLoading] = useState(false);
   const [inputText, setInputText] = useState("")
-  const [products, setProducts] = useState([])
-  const [checked, setChecked] = useState({
-    a: false,
-    b: false,
-    c: false,
-  });
-  
-  function handleChange(handleChange) {
-    console.log(handleChange)
-    const newChecked = {...checked}
-    newChecked[handleChange.target.value] = !newChecked[handleChange.target.value]
-    setChecked(newChecked)
-  }
+  const [articles, setArticles] = useState([])
   
   async function doSearch() {
     try {
-      const response = await API.graphql(graphqlOperation(searchArticlesEs, {word: inputText}));
+      setLoading(true)
+      const response = await API.graphql(graphqlOperation(searchBlogs, {
+        input: {
+          word: inputText,
+          fuzziness: Math.ceil(inputText.length / 6 - 1)
+        }
+      }));
+      setLoading(false)
       console.log(response)
-      setProducts(response.data.searchArticlesEs)
+      setArticles(response.data.searchBlogs)
     } catch (err) { console.log('error doSearch') }
-  }
-  
-  async function doList() {
-    try {
-      const response = await API.graphql(graphqlOperation(listProducts));
-      console.log(response)
-      setProducts(response.data.listProducts)
-    } catch (err) { console.log('error doList') }
   }
   
   function handleInputChange(event) {
     console.log(event)
     setInputText(event.target.value)
-    //doSearch()
+    // doSearch()
+  }
+  
+  async function handleSlideChange(event, id) {
+    console.log(handleSlideChange, event, id)
+    try {
+      const response = await API.graphql(graphqlOperation(updateBlogLank, {
+        input: {
+          id: id,
+          lank: parseInt(event.target.ariaValueNow)
+        }
+      }));
+      console.log(response)
+    } catch (err) { console.log('error doSearch') }
+  }
+  
+  function HighlightedContent(props) {
+    let contents = ''
+    if (props.highlight.content) {
+      for (let i in props.highlight.content) {
+        contents += '.....' + props.highlight.content[i] + '.....'
+      }
+    }
+    return (
+      <Box className={classes.blogContent} dangerouslySetInnerHTML={{__html: contents}} />  
+    )
   }
 
   return (
     <div>
-      <Container maxWidth="sm" component="main" className={classes.heroContent}>
+      <Container maxWidth="md" component="main" className={classes.heroContent}>
         <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
           Search
         </Typography>
         <Typography variant="h5" align="center" color="textSecondary" component="p">
-          Search Elastic Search
+          Search by AWS Elasticsearch Service 2.3 t2.micro instance
         </Typography>
       </Container>
       <Box display="flex" justifyContent="center">
         <Paper className={classes.root}>
-          <IconButton className={classes.iconButton} aria-label="menu" onClick={doList}>
-            <MenuIcon />
-          </IconButton>
           <InputBase
             className={classes.input}
             placeholder="Search"
@@ -118,72 +124,31 @@ function SearchErastic() {
           <IconButton className={classes.iconButton} aria-label="search" onClick={doSearch}>
             <SearchIcon />
           </IconButton>
-          <Divider className={classes.divider} orientation="vertical" mr={2} />
-          <Box>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={checked.a}
-                  onChange={handleChange}
-                  name="checkedA"
-                  color="Primary"
-                  value='a'
-                />
-              }
-              label="Title"
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={checked.b}
-                  onChange={handleChange}
-                  name="checkedB"
-                  color="Primary"
-                  value='b'
-                />
-              }
-              label="Body"
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={checked.c}
-                  onChange={handleChange}
-                  name="checkedC"
-                  color="Primary"
-                  value='c'
-                />
-              }
-              label="Discontinued"
-            />
-          </Box>
         </Paper>
       </Box>
-      <Container maxWidth="lg" component="main" className={classes.heroContent}>
-        <TableContainer component={Paper} className={classes.tableContainer}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Id</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Tags</TableCell>
-                <TableCell>Filename</TableCell>
-                <TableCell>Content</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {products.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{row.id}</TableCell>
-                  <TableCell>{row.title}</TableCell>
-                  <TableCell>{row.tags}</TableCell>
-                  <TableCell>{row.filename}</TableCell>
-                  <TableCell>{row.content}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      <Container maxWidth="md" component="blogContents" className={classes.blogContainer}>
+        { loading ? <LinearProgress /> : '' }
+        {articles.map((row, index) => (
+          <React.Fragment key={index}> 
+            <Box className={classes.blogTitle}>
+              <Typography variant="h6" align="left">
+                {row.title}
+              </Typography>
+              <Slider
+                className={classes.slider}
+                value={row.lank}
+                aria-labelledby="discrete-slider"
+                valueLabelDisplay="auto"
+                step={1}
+                marks
+                min={0}
+                max={5}
+                onChangeCommitted={e  => handleSlideChange(e, row.id)}
+              />
+            </Box>
+            <HighlightedContent highlight={row.highlight} />
+          </React.Fragment> 
+        ))}
       </Container>
     </div>
   )

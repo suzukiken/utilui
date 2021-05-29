@@ -77,6 +77,25 @@ export const listProducts = /* GraphQL */ `
     }
   }
 `;
+export const searchBlogs = /* GraphQL */ `
+  query SearchBlogs($input: WordInput) {
+    searchBlogs(input: $input) {
+      id
+      title
+      content
+      category
+      tags
+      date
+      lank
+      highlight {
+        title
+        content
+        category
+        tags
+      }
+    }
+  }
+`;
 export const getArticle = /* GraphQL */ `
   query GetArticle($id: String) {
     getArticle(id: $id) {
@@ -103,17 +122,6 @@ export const searchArticles = /* GraphQL */ `
   query SearchArticles($word: String) {
     searchArticles(word: $word) {
       id
-      content
-      date
-      tags
-      title
-    }
-  }
-`;
-export const searchArticlesEs = /* GraphQL */ `
-  query SearchArticlesEs($word: String) {
-    searchArticlesEs(word: $word) {
-      filename
       content
       date
       tags

@@ -1,6 +1,9 @@
 ais-highlight-0000000000 {
   background: #FFFF99;
-
   margin: 0 1px 0 1px;
   padding: 0 3px 0 3px;
+}
+
+blogcontents em {
+  background: #FFFF99;
 }

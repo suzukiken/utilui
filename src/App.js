@@ -98,8 +98,8 @@ export default function App() {
             <Link href="/search" className={classes.toolbarLink}>
               SEARCH
             </Link>
-            <Link href="/articles" className={classes.toolbarLink}>
-              ARTICLES
+            <Link href="/markdown" className={classes.toolbarLink}>
+              MARKDOWN
             </Link>
             <Link href="/elasticsearch" className={classes.toolbarLink}>
               ELASTICSEARCH
@@ -126,10 +126,10 @@ export default function App() {
             <Route path="/notify">
               <Notify />
             </Route>
-            <Route path="/articles">
+            <Route path="/markdown">
               <Articles />
             </Route>
-            <Route path="/article/:id">
+            <Route path="/markdown/:id">
               <Articles />
             </Route>
             <Route path="/elasticsearch">

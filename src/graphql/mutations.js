@@ -48,3 +48,22 @@ export const putEvent = /* GraphQL */ `
     }
   }
 `;
+export const updateBlogLank = /* GraphQL */ `
+  mutation UpdateBlogLank($input: LankInput) {
+    updateBlogLank(input: $input) {
+      id
+      title
+      content
+      category
+      tags
+      date
+      lank
+      highlight {
+        title
+        content
+        category
+        tags
+      }
+    }
+  }
+`;
