@@ -20,6 +20,8 @@ const awsmobile = {
     "aws_appsync_graphqlEndpoint": "${APPSYNC_GRAPHQL_URL}",
     "aws_appsync_region": "ap-northeast-1",
     "aws_appsync_authenticationType": "AWS_IAM",
+    "aws_user_files_s3_bucket": "${S3_BUCKETNAME}",
+    "aws_user_files_s3_bucket_region": "ap-northeast-1"
 };
 
 export default awsmobile;

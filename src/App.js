@@ -8,6 +8,7 @@ import Notify from './Notify';
 import ExportList from './ExportList';
 import Editor from './Editor';
 import Articles from './Articles';
+import Write from './Write';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -104,6 +105,9 @@ export default function App() {
             <Link href="/elasticsearch" className={classes.toolbarLink}>
               ELASTICSEARCH
             </Link>
+            <Link href="/write" className={classes.toolbarLink}>
+              WRITE
+            </Link>
             <Login />
           </Toolbar>
         </AppBar>
@@ -126,14 +130,20 @@ export default function App() {
             <Route path="/notify">
               <Notify />
             </Route>
-            <Route path="/markdown">
+            <Route path="/markdown/:id">
               <Articles />
             </Route>
-            <Route path="/markdown/:id">
+            <Route path="/markdown">
               <Articles />
             </Route>
             <Route path="/elasticsearch">
               <SearchElastic />
+            </Route>
+            <Route path="/write/:key">
+              <Write />
+            </Route>
+            <Route path="/write">
+              <Write />
             </Route>
           </Switch>
         </BrowserRouter>

@@ -150,7 +150,7 @@ function MaterialUiHits({ hits }) {
   const classes = useStyles();
   
   function handleClick(hit) {
-    window.open('/article/' + hit.filename)
+    window.open('/markdown/' + hit.filename)
   }
 
   return (
