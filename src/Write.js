@@ -57,7 +57,7 @@ function Write() {
   }
   
   function handleBodyChange(event) {
-    //console.log(event)
+    console.log(event)
     setBody(event.target.value)
   }
   
