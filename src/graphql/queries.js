@@ -129,3 +129,22 @@ export const searchArticles = /* GraphQL */ `
     }
   }
 `;
+export const listMails = /* GraphQL */ `
+  query ListMails {
+    listMails {
+      key
+      modified
+      size
+    }
+  }
+`;
+export const getMail = /* GraphQL */ `
+  query GetMail($id: String) {
+    getMail(id: $id)
+  }
+`;
+export const getParams = /* GraphQL */ `
+  query GetParams($content: String) {
+    getParams(content: $content)
+  }
+`;

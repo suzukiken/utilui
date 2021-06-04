@@ -9,8 +9,10 @@ import ExportList from './ExportList';
 import Editor from './Editor';
 import Articles from './Articles';
 import Write from './Write';
+import Mail from './Mail';
 import TypeFace from './TypeFace';
 import Upload from './Upload';
+import Download from './Download';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -116,6 +118,12 @@ export default function App() {
             <Link href="/upload" className={classes.toolbarLink}>
               UPLOAD
             </Link>
+            <Link href="/mail" className={classes.toolbarLink}>
+              MAIL
+            </Link>
+            <Link href="/download" className={classes.toolbarLink}>
+              DOWNLOAD
+            </Link>
             <Login />
           </Toolbar>
         </AppBar>
@@ -158,6 +166,12 @@ export default function App() {
             </Route>
             <Route path="/upload">
               <Upload />
+            </Route>
+            <Route path="/mail">
+              <Mail />
+            </Route>
+            <Route path="/download">
+              <Download />
             </Route>
           </Switch>
         </BrowserRouter>
