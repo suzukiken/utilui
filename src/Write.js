@@ -43,18 +43,29 @@ function Write() {
   let { key } = useParams();
   
   useEffect(() => {
-    console.log('useEffect', key)
-  }, [key])
-  
-  useEffect(() => {
+    
+    async function getContent(key) {
+      console.log('getContent', key)
+      try {
+        const result = await Storage.get(key, {
+          customPrefix: {
+            public: ''
+          },
+          download: true
+        })
+        // setBody()
+        const content = await result.Body.text()
+        setBody(content)
+        setFilename(key)
+        //console.log(content)
+      } catch (err) {
+        console.log('error getContent', err)
+      }
+    }
     if (key && userContext && userContext.authenticated) {
       getContent(key)
     }
   }, [key, userContext])
-  
-  const customPrefix = {
-    public: ''
-  }
   
   function handleBodyChange(event) {
     console.log(event)
@@ -70,7 +81,9 @@ function Write() {
   async function doSave() {
     console.log('doSave')
     const result = await Storage.put(filename, body, {
-      customPrefix: customPrefix,
+      customPrefix: {
+        public: ''
+      },
     })
     console.log(result)
     setOpen(false)
@@ -80,7 +93,9 @@ function Write() {
     console.log('checkExists', key)
     try {
       const result = await Storage.list('', {
-        customPrefix: customPrefix
+        customPrefix: {
+          public: ''
+        },
       })
       let found = false
       for (let obj of result) {
@@ -92,23 +107,6 @@ function Write() {
       console.log(result, found)
     } catch (err) {
       console.log('error checkExists', err)
-    }
-  }
-  
-  async function getContent(key) {
-    console.log('getContent', key)
-    try {
-      const result = await Storage.get(key, {
-        customPrefix: customPrefix,
-        download: true
-      })
-      // setBody()
-      const content = await result.Body.text()
-      setBody(content)
-      setFilename(key)
-      //console.log(content)
-    } catch (err) {
-      console.log('error getContent', err)
     }
   }
   

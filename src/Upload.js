@@ -9,8 +9,7 @@ import { v1 as uuidv1 } from 'uuid';
 import IconButton from '@material-ui/core/IconButton';
 import Attachment from '@material-ui/icons/Attachment';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import React, {useMemo} from 'react';
-import {useDropzone} from 'react-dropzone';
+import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {

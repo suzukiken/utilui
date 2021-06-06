@@ -1,15 +1,14 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useUserContext } from './UserContext';
+import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, IconButton } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
 import { getParams } from './graphql/queries';
 import TextField from '@material-ui/core/TextField';
-import fileDownload from 'js-file-download'
+import fileDownload from 'js-file-download';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -19,8 +18,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Download() {
   const classes = useStyles();
-  const { userContext } = useUserContext()
-  
+
   const [content, setContent] = useState('');
   const [respond, setRespond] = useState('');
   
@@ -85,6 +83,17 @@ function Download() {
           </Button>
         </Box>
       </Container>
+      <Box>
+        <pre>
+          BUCKET_NAME: ssm::/user/local
+          BUCKET_NAME2: ssm:ap-northeast-1:/user/local
+          TABLE_NAME: cfn::table-name
+          TABLE_NAME2: cfn:us-east-1:table-name
+          PASSWORD: sm::slack-app-telldone
+          PASSWORD2: sm::slack-app-telldone:hellokitty
+          PASSWORD2: sm:us-east-1:slack-app-telldone
+        </pre>
+      </Box>
     </React.Fragment> 
   );
 }

@@ -31,30 +31,26 @@ function Articles() {
   
   let { id } = useParams();
   
-  console.log('Articles', id)
-  
   const [contents, setContents] = useState([]);
   
   useEffect(() => {
+    async function doGet(key) {
+      try {
+        const response = await API.graphql(graphqlOperation(getArticle, {id: "blog/" + key}));
+        console.log(response.data.getArticle)
+        setContents([...contents, response.data.getArticle])
+      } catch (err) {
+        console.log('error doGet') 
+      }
+    }
     if (userContext && userContext.authenticated) {
       if (id) {
-        doGet()
+        doGet(id)
       } else {
         doListArticles()
       }
     }
-  }, [userContext])
-  
-  async function doGet() {
-    console.log('doGet')
-    try {
-      const response = await API.graphql(graphqlOperation(getArticle, {id: "blog/" + id}));
-      console.log(response.data.getArticle)
-      let newContents = []
-      newContents.push(response.data.getArticle)
-      setContents(newContents)
-    } catch (err) { console.log('error doGet') }
-  }
+  }, [id, userContext, contents])
   
   async function doListArticles() {
     console.log('doListArticles')

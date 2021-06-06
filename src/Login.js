@@ -4,12 +4,30 @@ import { Button } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { useUserContext } from './UserContext';
+import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
-  link: {
-    margin: theme.spacing(1, 1.5),
+  user: {
+    margin: theme.spacing(1),
+  },
+  signButton: {
+    margin: theme.spacing(1),
   }
 }))
+
+function UserInfo(props) {
+  const classes = useStyles();
+  if (props.userInfo) {
+    return (
+      <nav>
+        <Typography className={classes.user}>
+          User: {props.userInfo.attributes.email}
+        </Typography>
+      </nav>
+    )
+  }
+  return (null)
+}
 
 function Login() {
   const classes = useStyles();
@@ -31,40 +49,40 @@ function Login() {
 
   useEffect(() => {
     Hub.listen('auth', ({ payload: { event, data } }) => {
-      switch (event) {
-        case 'signIn':
-          console.log('signIn');
-          break;
-        case 'signOut':
-          console.log('signOut');
-          setUser(null);
-          break;
-        case 'signIn_failure':
-          console.log('signIn_failure');
-          break;
-        default:
-          console.log('default');
+      if (event === 'signIn') {
+        getUser().then(userData => setUser(userData));
+      } else if (event === 'signOut') {
+        setUser(null);
       }
-    });
+    })
     getUser().then(userData => setUser(userData));
-  }, []);
+  }, [])
   
   useEffect(() => {
     if (user) {
       Auth.currentUserInfo().then((userInfoData) => {
         console.log('userinfo', userInfoData)
-        setUserInfo(userInfoData);
-      });
+        setUserInfo(userInfoData)
+      })
     }
-  }, [user]);
+  }, [user])
+  
+  useEffect(() => {
+    if (user) {
+      const jwtToken = user.signInUserSession.idToken.jwtToken
+      setJwt(jwtToken)
+    }
+  }, [user])
+  
+  useEffect(() => {
+    if (user) {
+      setUserContext({authenticated: true})
+    }
+  }, [user, setUserContext])
 
   function getUser() {
     return Auth.currentAuthenticatedUser()
       .then(userData => {
-        const jwtToken = userData.signInUserSession.idToken.jwtToken
-        setJwt(jwtToken)
-        // const jwtTokenPayload = JSON.parse(window.atob(jwtToken.split('.')[1]))
-        setUserContext({authenticated: true})
         return userData
       })
       .catch(() => console.log('Not signed in'));
@@ -72,22 +90,23 @@ function Login() {
   
   return (
     <React.Fragment>
-      <nav>
-        <Typography className={classes.link}>
-          User: {userInfo ? userInfo.attributes.email : 'None'}
-        </Typography>
-      </nav>
-      { user?
-        <Button variant="contained"
-          onClick={() => Auth.signOut()}
-          >Sign Out
-        </Button>
-        :
-        <Button color="primary" variant="outlined" className={classes.link}
-          onClick={() => Auth.federatedSignIn()}
-          >Sign In
-        </Button>
-      }
+      <UserInfo userInfo={userInfo} />
+      <Box className={classes.signButton}>
+        { user?
+          <Button 
+            variant="outlined"
+            onClick={() => Auth.signOut()}
+            >Sign Out
+          </Button>
+          :
+          <Button 
+            color="primary" 
+            variant="contained"
+            onClick={() => Auth.federatedSignIn()}
+            >Sign In
+          </Button>
+        }
+      </Box>
     </React.Fragment>
   )
 }
