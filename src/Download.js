@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
@@ -8,7 +8,15 @@ import Container from '@material-ui/core/Container';
 import { graphqlOperation, API } from 'aws-amplify';
 import { getParams } from './graphql/queries';
 import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
 import fileDownload from 'js-file-download';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Snackbar from '@material-ui/core/Snackbar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -19,14 +27,20 @@ const useStyles = makeStyles((theme) => ({
 function Download() {
   const classes = useStyles();
 
+  const LOCALSTORAGE_KEY = 'download'
+  
   const [content, setContent] = useState('');
   const [respond, setRespond] = useState('');
+  const [openBar, setOpenBar] = useState(false);
+  const [barMessage, setBarMessage] = useState('');
+  const [searchedItems, setSearchedItems] = useState([]);
   
   async function doGet() {
     try {
       const response = await API.graphql(graphqlOperation(getParams, {content: content}));
       console.log(response)
       setRespond(response.data.getParams)
+      updateSearchedItems()
     } catch (err) { console.log('error getParams') }
   }
   
@@ -38,6 +52,44 @@ function Download() {
   function doSave() {
     console.log('doSave', respond)
     fileDownload(respond, 'my.txt')
+  }
+  
+  useEffect(() => {
+    let items = window.localStorage.getItem(LOCALSTORAGE_KEY)
+    if (!items) {
+      items = []
+    } else {
+      items = JSON.parse(items)
+    }
+    console.log(items)
+    setSearchedItems(items)
+  }, []) 
+  
+  function updateSearchedItems() {
+    let newItems = [...searchedItems]
+    const items = content.split('\n')
+    for (let line of items) {
+      newItems.push(line)
+    }
+    const newItems2 = Array.from(new Set(newItems))
+    setSearchedItems(newItems2)
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(newItems2))
+  }
+  
+  function deleteItem(itemText) {
+    let newItems = [...searchedItems]
+    const index = searchedItems.indexOf(itemText)
+    newItems.splice(index, 1)
+    setSearchedItems(newItems)
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(newItems))
+  }
+  
+  
+  function copyText(itemText) {
+    navigator.clipboard.writeText(itemText).then(function() {
+      setBarMessage(`copied ${itemText}`)
+      setOpenBar(true)
+    })
   }
   
   return (
@@ -83,17 +135,34 @@ function Download() {
           </Button>
         </Box>
       </Container>
-      <Box>
-        <pre>
-          BUCKET_NAME: ssm::/user/local
-          BUCKET_NAME2: ssm:ap-northeast-1:/user/local
-          TABLE_NAME: cfn::table-name
-          TABLE_NAME2: cfn:us-east-1:table-name
-          PASSWORD: sm::slack-app-telldone
-          PASSWORD2: sm::slack-app-telldone:hellokitty
-          PASSWORD2: sm:us-east-1:slack-app-telldone
-        </pre>
-      </Box>
+      <Container maxWidth="sm">
+        <Paper elevation={1} square>
+          <Box m={1}>
+            <List component="nav" aria-label="main mailbox folders">
+              {searchedItems.map((item, index) => (
+                <ListItem button key={index} onClick={() => copyText(item)}>
+                  <ListItemText primary={item} />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" aria-label="delete" onClick={() => deleteItem(item)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Paper>
+      </Container>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={openBar}
+        autoHideDuration={500}
+        message={barMessage}
+        onClose={() => setOpenBar(false)}
+      />
     </React.Fragment> 
   );
 }
