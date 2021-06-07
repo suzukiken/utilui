@@ -14,6 +14,7 @@ import TypeFace from './TypeFace';
 import Upload from './Upload';
 import Download from './Download';
 import Blog from './Blog';
+import UserManager from './UserManager';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -128,6 +129,9 @@ export default function App() {
             <Link href="/blog" className={classes.toolbarLink}>
               BLOG
             </Link>
+            <Link href="/admin" className={classes.toolbarLink}>
+              ADMIN
+            </Link>
             <Login />
           </Toolbar>
         </AppBar>
@@ -179,6 +183,9 @@ export default function App() {
             </Route>
             <Route path="/blog">
               <Blog />
+            </Route>
+            <Route path="/admin">
+              <UserManager />
             </Route>
           </Switch>
         </BrowserRouter>

@@ -47,20 +47,20 @@ function Articles() {
       if (id) {
         doGet(id)
       } else {
-        doListArticles()
+        doListArticles().then(data => setContents(data))
       }
     }
-  }, [id, userContext, contents])
+  }, [id, userContext])
   
-  async function doListArticles() {
+  function doListArticles() {
     console.log('doListArticles')
-    try {
-      const response = await API.graphql(graphqlOperation(listArticles, {limit: 10}));
-      console.log(response.data.listArticles)
-      setContents(response.data.listArticles)
-    } catch (err) { console.log('error listArticles') }
+    return API.graphql(graphqlOperation(listArticles, {limit: 10}))
+      .then(response => {
+        return response.data.listArticles
+      })
+      .catch(() => console.log('error listArticles'))
   }
-
+  
   return (
     <React.Fragment> 
       <Container maxWidth="lg" component="main" className={classes.heroContent}>

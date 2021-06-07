@@ -67,3 +67,8 @@ export const updateBlogLank = /* GraphQL */ `
     }
   }
 `;
+export const deactivateRefreshToken = /* GraphQL */ `
+  mutation DeactivateRefreshToken($email: String) {
+    deactivateRefreshToken(email: $email)
+  }
+`;

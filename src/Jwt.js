@@ -12,9 +12,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { useUserContext } from './UserContext';
+import jwt_decode from "jwt-decode";
 
 const useStyles = makeStyles((theme) => ({
   heroContent: {
@@ -29,6 +31,17 @@ function Jwt() {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [claims, setClaims] = useState(null);
+  
+  const { userContext } = useUserContext()
+  
+  useEffect(() => {
+    if (userContext && userContext.authenticated) {
+      const jwtIdToken = userContext.user.signInUserSession.idToken.jwtToken
+      console.log(new Date(jwt_decode(jwtIdToken).exp * 1000))
+      const jwtAccessToken = userContext.user.signInUserSession.accessToken.jwtToken
+      console.log(jwt_decode(jwtAccessToken))
+    }
+  }, [userContext])
   
   async function doParseJwt() {
     try {

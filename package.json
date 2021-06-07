@@ -17,6 +17,8 @@
     "fuse.js": "^6.4.6",
     "instantsearch.css": "^7.4.5",
     "js-file-download": "^0.4.12",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
     "markdown-to-jsx": "^7.1.3",
     "material-ui-dropzone": "^3.5.0",
     "react": "^17.0.2",

@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 function UserInfo(props) {
   const classes = useStyles();
-  if (props.userInfo) {
+  if (props.userInfo && props.userInfo.attributes) {
     return (
       <nav>
         <Typography className={classes.user}>
@@ -76,7 +76,14 @@ function Login() {
   
   useEffect(() => {
     if (user) {
-      setUserContext({authenticated: true})
+      setUserContext({
+        authenticated: true,
+        user: user
+      })
+    } else {
+      setUserContext({
+        authenticated: false
+      })
     }
   }, [user, setUserContext])
 

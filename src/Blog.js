@@ -5,9 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
@@ -50,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     minHeight: 180,
+    maxHeight: 400,
   }
 }))
 
@@ -125,6 +124,10 @@ function Blog() {
                         {item.filename}
                       </Typography>
                     </CardContent>
+                    <CardMedia 
+                      component="img"
+                      image="DSC_0141.JPG" 
+                      title={item.title} />
                   </div>
                 </Card>
               </CardActionArea>
@@ -146,6 +149,10 @@ function Blog() {
                         {item.filename}
                       </Typography>
                     </CardContent>
+                    <CardMedia 
+                      component="img"
+                      image="DSC_0163.JPG" 
+                      title={item.title} />
                   </div>
                 </Card>
               </CardActionArea>
@@ -166,6 +173,10 @@ function Blog() {
                       {primary.filename}
                     </Typography>
                   </CardContent>
+                  <CardMedia 
+                    component="img"
+                    image="DSC_0166.JPG" 
+                    title={primary.title} />
                 </div>
               </Card>
             </CardActionArea>
