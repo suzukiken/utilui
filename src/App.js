@@ -7,13 +7,9 @@ import SearchElastic from './SearchElastic';
 import Notify from './Notify';
 import ExportList from './ExportList';
 import Editor from './Editor';
-import Articles from './Articles';
 import Write from './Write';
 import Mail from './Mail';
-import TypeFace from './TypeFace';
-import Upload from './Upload';
 import Download from './Download';
-import Blog from './Blog';
 import UserManager from './UserManager';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -105,29 +101,17 @@ export default function App() {
             <Link href="/search" className={classes.toolbarLink}>
               SEARCH
             </Link>
-            <Link href="/markdown" className={classes.toolbarLink}>
-              MARKDOWN
-            </Link>
             <Link href="/elasticsearch" className={classes.toolbarLink}>
               ELASTICSEARCH
             </Link>
             <Link href="/write" className={classes.toolbarLink}>
               WRITE
             </Link>
-            <Link href="/typeface" className={classes.toolbarLink}>
-              TYPE
-            </Link>
-            <Link href="/upload" className={classes.toolbarLink}>
-              UPLOAD
-            </Link>
             <Link href="/mail" className={classes.toolbarLink}>
               MAIL
             </Link>
             <Link href="/download" className={classes.toolbarLink}>
               DOWNLOAD
-            </Link>
-            <Link href="/blog" className={classes.toolbarLink}>
-              BLOG
             </Link>
             <Link href="/admin" className={classes.toolbarLink}>
               ADMIN
@@ -154,12 +138,6 @@ export default function App() {
             <Route path="/notify">
               <Notify />
             </Route>
-            <Route path="/markdown/:id">
-              <Articles />
-            </Route>
-            <Route path="/markdown">
-              <Articles />
-            </Route>
             <Route path="/elasticsearch">
               <SearchElastic />
             </Route>
@@ -169,20 +147,11 @@ export default function App() {
             <Route path="/write">
               <Write />
             </Route>
-            <Route path="/typeface">
-              <TypeFace />
-            </Route>
-            <Route path="/upload">
-              <Upload />
-            </Route>
             <Route path="/mail">
               <Mail />
             </Route>
             <Route path="/download">
               <Download />
-            </Route>
-            <Route path="/blog">
-              <Blog />
             </Route>
             <Route path="/admin">
               <UserManager />
