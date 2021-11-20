@@ -101,14 +101,13 @@ function Login() {
       <Box className={classes.signButton}>
         { user?
           <Button 
-            variant="outlined"
+            variant="text"
             onClick={() => Auth.signOut()}
             >Sign Out
           </Button>
           :
           <Button 
-            color="primary" 
-            variant="contained"
+            variant="text"
             onClick={() => Auth.federatedSignIn()}
             >Sign In
           </Button>
